@@ -1,16 +1,16 @@
-app.component('taxList', {
-    templateUrl: tax_list_template_url,
+app.component('customerList', {
+    templateUrl: customer_list_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
         var table_scroll;
         table_scroll = $('.page-main-content').height() - 37;
-        var dataTable = $('#taxes').DataTable({
+        var dataTable = $('#customers_list').DataTable({
             "dom": cndn_dom_structure,
             "language": {
-                "search": "",
-                "searchPlaceholder": "Search",
+                // "search": "",
+                // "searchPlaceholder": "Search",
                 "lengthMenu": "Rows _MENU_",
                 "paginate": {
                     "next": '<i class="icon ion-ios-arrow-forward"></i>',
@@ -19,6 +19,16 @@ app.component('taxList', {
             },
             pageLength: 10,
             processing: true,
+            stateSaveCallback: function(settings, data) {
+                localStorage.setItem('CDataTables_' + settings.sInstance, JSON.stringify(data));
+            },
+            stateLoadCallback: function(settings) {
+                var state_save_val = JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
+                if (state_save_val) {
+                    $('#search_customer').val(state_save_val.search.search);
+                }
+                return JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
+            },
             serverSide: true,
             paging: true,
             stateSave: true,
@@ -26,7 +36,7 @@ app.component('taxList', {
             scrollY: table_scroll + "px",
             scrollCollapse: true,
             ajax: {
-                url: laravel_routes['getTaxList'],
+                url: laravel_routes['getCustomerList'],
                 type: "GET",
                 dataType: "json",
                 data: function(d) {},
@@ -34,48 +44,50 @@ app.component('taxList', {
 
             columns: [
                 { data: 'action', class: 'action', name: 'action', searchable: false },
-                { data: 'name', name: 'taxes.name' },
-                { data: 'type', name: 'configs.name' },
+                { data: 'code', name: 'customers.code' },
+                { data: 'name', name: 'customers.name' },
+                { data: 'mobile_no', name: 'customers.mobile_no' },
+                { data: 'email', name: 'customers.email' },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
-                $('#table_info').html('(' + max + ')')
+                $('#table_info').html(total)
+                $('.foot_info').html('Showing ' + start + ' to ' + end + ' of ' + max + ' entries')
             },
             rowCallback: function(row, data) {
                 $(row).addClass('highlight-row');
             }
         });
         $('.dataTables_length select').select2();
-        $('#search_taxes').val(this.value);
 
         $scope.clear_search = function() {
-            $('#search_taxes').val('');
-            $('#taxes').DataTable().search('').draw();
+            $('#search_customer').val('');
+            $('#customers_list').DataTable().search('').draw();
         }
 
-        var dataTables = $('#taxes').dataTable();
-        $("#search_taxes").keyup(function() {
+        var dataTables = $('#customers_list').dataTable();
+        $("#search_customer").keyup(function() {
             dataTables.fnFilter(this.value);
         });
 
-        $scope.deleteTax = function($id) {
-            $('#tax_id').val($id);
+        $scope.deleteCustomer = function($id) {
+            $('#customer_id').val($id);
         }
         $scope.deleteConfirm = function() {
-            $id = $('#tax_id').val();
+            $id = $('#customer_id').val();
             $http.get(
-                tax_delete_data_url + '/' + $id,
+                customer_delete_data_url + '/' + $id,
             ).then(function(response) {
                 if (response.data.success) {
                     $noty = new Noty({
                         type: 'success',
                         layout: 'topRight',
-                        text: 'Tax Deleted Successfully',
+                        text: 'Customer Deleted Successfully',
                     }).show();
                     setTimeout(function() {
                         $noty.close();
                     }, 3000);
-                    $('#taxes').DataTable().ajax.reload(function(json) {});
-                    $location.path('/tax-pkg/tax/list');
+                    $('#customers_list').DataTable().ajax.reload(function(json) {});
+                    $location.path('/customer-pkg/customer/list');
                 }
             });
         }
@@ -84,10 +96,10 @@ app.component('taxList', {
 });
 //------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------
-app.component('taxForm', {
-    templateUrl: tax_form_template_url,
+app.component('customerForm', {
+    templateUrl: customer_form_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
-        get_form_data_url = typeof($routeParams.id) == 'undefined' ? tax_get_form_data_url : tax_get_form_data_url + '/' + $routeParams.id;
+        get_form_data_url = typeof($routeParams.id) == 'undefined' ? customer_get_form_data_url : customer_get_form_data_url + '/' + $routeParams.id;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
         self.angular_routes = angular_routes;
@@ -95,56 +107,95 @@ app.component('taxForm', {
             get_form_data_url
         ).then(function(response) {
             console.log(response);
-            self.tax = response.data.tax;
-            self.type_list = response.data.type_list;
+            self.customer = response.data.customer;
+            self.country_list = response.data.country_list;
             self.action = response.data.action;
-            if (response.data.action == 'Edit') {
-                if (response.data.tax[0].deleted_at) {
-                    self.tax = [];
-                    self.tax.push({
-                        id: response.data.tax[0].id,
-                        name: response.data.tax[0].name,
-                        type_id: response.data.tax[0].type_id,
-                        switch_value: 'Inactive',
-                    });
-                } else {
-                    self.tax = [];
-                    self.tax.push({
-                        id: response.data.tax[0].id,
-                        name: response.data.tax[0].name,
-                        type_id: response.data.tax[0].type_id,
-                        switch_value: 'Active',
-                    });
-                }
-            } else {
-                $scope.add_tax();
-            }
             $rootScope.loading = false;
         });
-        //ADD TAX
-        $scope.add_tax = function() {
-            self.tax.push({
-                switch_value: 'Active',
+
+        /* Tab Funtion */
+        $('.btn-nxt').on("click", function() {
+            $('.cndn-tabs li.active').next().children('a').trigger("click");
+            tabPaneFooter();
+        });
+        $('.btn-prev').on("click", function() {
+            $('.cndn-tabs li.active').prev().children('a').trigger("click");
+            tabPaneFooter();
+        });
+        $('.btn-pills').on("click", function() {
+            tabPaneFooter();
+        });
+        $scope.btnNxt = function() {}
+        $scope.prev = function() {}
+
+        //SELECT STATE BASED COUNTRY
+        $scope.onSelectedCountry = function(id) {
+            $http.get(
+                customer_get_state_list_data + '/' + id
+            ).then(function(response) {
+                // console.log(response);
+                self.state_list = response.data.state_list;
             });
         }
-        //REMOVE TAX 
-        $scope.removeTax = function(index, tax_id) {
-            console.log(index, tax_id);
-            if (tax_id) {
-                self.tax_removal_id.push(tax_id);
-                $('#tax_removal_id').val(JSON.stringify(self.tax_removal_id));
-            }
-            self.tax.splice(index, 1);
+
+        //SELECT CITY BASED STATE
+        $scope.onSelectedState = function(id) {
+            $http.get(
+                customer_get_city_list_data + '/' + id
+            ).then(function(response) {
+                // console.log(response);
+                self.city_list = response.data.city_list;
+            });
         }
 
         var form_id = '#form';
         var v = jQuery(form_id).validate({
             ignore: '',
+            rules: {
+                'code': {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 255,
+                },
+                'name': {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 255,
+                },
+                'cust_group': {
+                    required: true,
+                    maxlength: 100,
+                },
+                'mobile_no': {
+                    required: true,
+                    minlength: 10,
+                    maxlength: 25,
+                },
+                'email': {
+                    required: true,
+                    email: true,
+                    minlength: 6,
+                    maxlength: 255,
+                },
+                'address_line1': {
+                    minlength: 3,
+                    maxlength: 255,
+                },
+                'address_line2': {
+                    minlength: 3,
+                    maxlength: 255,
+                },
+                'pincode': {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 6,
+                },
+            },
             submitHandler: function(form) {
                 let formData = new FormData($(form_id)[0]);
                 $('#submit').button('loading');
                 $.ajax({
-                        url: laravel_routes['saveTax'],
+                        url: laravel_routes['saveCustomer'],
                         method: "POST",
                         data: formData,
                         processData: false,
@@ -160,7 +211,7 @@ app.component('taxForm', {
                             setTimeout(function() {
                                 $noty.close();
                             }, 3000);
-                            $location.path('/tax-pkg/tax/list');
+                            $location.path('/customer-pkg/customer/list');
                             $scope.$apply();
                         } else {
                             if (!res.success == true) {
@@ -179,7 +230,7 @@ app.component('taxForm', {
                                 }, 3000);
                             } else {
                                 $('#submit').button('reset');
-                                $location.path('/tax-pkg/tax/list');
+                                $location.path('/customer-pkg/customer/list');
                                 $scope.$apply();
                             }
                         }

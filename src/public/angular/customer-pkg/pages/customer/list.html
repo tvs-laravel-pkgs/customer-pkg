@@ -3,7 +3,7 @@
         <div class="page-header-inner">
             <div class="page-header-content-left">
                 <div class="page-header-content title-block">
-                    <h1 class="title type-2">Taxes</h1>
+                    <h1 class="title type-2">Customers</h1>
                 </div><!-- Page Header Content -->
                 <div class="page-header-content button-block">
                     <button class="btn btn-bordered" data-toggle="modal" data-target="#filter"><i class="icon ion-md-funnel"></i>Filter</button>
@@ -19,13 +19,13 @@
                 <div class="page-header-content search-block">
                     <div class="search_filter">
                         <label>
-                            <input type="search" id="search_taxes" class="form-control" placeholder="Search" />
+                            <input type="search" id="search_customer" class="form-control" placeholder="Search" />
                             <button class="btn-clear" ng-click="clear_search()">Clear</button>
                         </label>
                     </div><!-- Search Filter -->
                 </div><!-- Page Header Content -->
                 <div class="page-header-content button-block">
-                    <a href="#!/tax-pkg/tax/add" class="btn btn-primary">Add New</a>
+                    <a href="#!/customer-pkg/customer/add" class="btn btn-primary">Add New</a>
                 </div><!-- Page Header Content -->
             </div><!-- Page Header Content Right -->
         </div><!-- Page Header Inner -->
@@ -34,13 +34,14 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table" id="taxes" style="width: 100% !important;">
+                    <table class="table" id="customers_list" style="width: 100% !important;">
                         <thead>
                             <tr>
                                 <th class="action">Action</th>
-                                <th>Tax Name</th>
-                                <th>Type</th>
-                                <!-- <th>Status</th> -->
+                                <th>Customer Code</th>
+                                <th>Customer Name</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
                             </tr>
                         </thead>
                     </table>
@@ -50,7 +51,7 @@
     </div><!-- Page Main Content -->
 </div><!-- Content Wrap -->
 <!-- Modal -->
-<div class="modal fade alert-modal failure" id="delete_tax" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade alert-modal failure" id="delete_customer" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -59,7 +60,7 @@
             <div class="modal-body">
                 <h5>Delete</h5>
                 <p>You can’t retrive the data again, Are you sure you want to delete? </p>
-                <input type="hidden" name="tax_id" id="tax_id" value="">
+                <input type="hidden" name="customer_id" id="customer_id" value="">
                 <button class="btn btn-grey" data-dismiss="modal" aria-label="Close">Cancel</button>
                 <button class="btn btn-rose" ng-click="deleteConfirm()" type="button" data-dismiss="modal" aria-label="Close">Yes</button>
             </div>
