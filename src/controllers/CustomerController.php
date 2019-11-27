@@ -90,7 +90,7 @@ class CustomerController extends Controller {
 	}
 
 	public function saveCustomer(Request $request) {
-		dd($request->all());
+		// dd($request->all());
 		try {
 			$error_messages = [
 				'code.required' => 'Customer Code is Required',
