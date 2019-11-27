@@ -56,7 +56,7 @@ class CustomerController extends Controller {
 			$action = 'Add';
 		} else {
 			$customer = Customer::find($id);
-			$address = Address::find($id);
+			$address = Address::where('address_of_id', 24)->where('entity_id', $id)->first();
 			$action = 'Edit';
 		}
 		$this->data['country_list'] = $country_list = Collect(Country::select('id', 'name')->get())->prepend(['id' => '', 'name' => 'Select Country']);
@@ -92,6 +92,7 @@ class CustomerController extends Controller {
 				'address_line1.required' => 'Address Line 1 is Required',
 				'address_line1.max' => 'Maximum 255 Characters',
 				'address_line1.min' => 'Minimum 3 Characters',
+				'address_line2.max' => 'Maximum 255 Characters',
 				'pincode.required' => 'Pincode is Required',
 				'pincode.max' => 'Maximum 6 Characters',
 				'pincode.min' => 'Minimum 6 Characters',
@@ -102,6 +103,7 @@ class CustomerController extends Controller {
 				'mobile_no' => 'required|max:25',
 				'email' => 'required',
 				'address_line1' => 'required|max:255|min:3',
+				'address_line2' => 'max:255',
 				'pincode' => 'required|max:6|min:6',
 			], $error_messages);
 			if ($validator->fails()) {
@@ -114,19 +116,15 @@ class CustomerController extends Controller {
 				$address = new Address;
 			} else {
 				$customer = Customer::find($request->id);
-				$address = Address::find($request->id);
+				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
 			}
 			$customer->fill($request->all());
-			$customer->cust_group = $request->cust_group;
-			$customer->dimension = $request->dimension;
-			$customer->mobile_no = $request->mobile_no;
-			$customer->email = $request->email;
 			$customer->company_id = Auth::user()->company_id;
 			$customer->save();
 
 			$address->fill($request->all());
 			$address->company_id = Auth::user()->company_id;
-			$address->address_of_id =
+			$address->address_of_id = 24;
 			$address->entity_id = $customer->id;
 			$address->address_type_id = 40;
 			$address->name = 'Primary Address';
@@ -134,9 +132,9 @@ class CustomerController extends Controller {
 
 			DB::commit();
 			if (!($request->id)) {
-				return response()->json(['success' => true, 'message' => ['Customer Added Successfully']]);
+				return response()->json(['success' => true, 'message' => ['Customer Details Added Successfully']]);
 			} else {
-				return response()->json(['success' => true, 'message' => ['Customer Updated Successfully']]);
+				return response()->json(['success' => true, 'message' => ['Customer Details Updated Successfully']]);
 			}
 		} catch (Exceprion $e) {
 			DB::rollBack();
@@ -146,6 +144,7 @@ class CustomerController extends Controller {
 	public function deleteCustomer($id) {
 		$delete_status = Customer::where('id', $id)->forceDelete();
 		if ($delete_status) {
+			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
 			return response()->json(['success' => true]);
 		}
 	}

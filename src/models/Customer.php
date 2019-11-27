@@ -5,15 +5,18 @@ namespace Abs\CustomerPkg;
 use App\Company;
 use App\Config;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model {
-	use SoftDeletes;
 	protected $table = 'customers';
+	public $timestamps = false;
 	protected $fillable = [
-		'created_by_id',
-		'updated_by_id',
-		'deleted_by_id',
+		'code',
+		'name',
+		'cust_group',
+		'dimension',
+		'mobile_no',
+		'email',
+		'company_id',
 	];
 
 	public static function createFromObject($record_data) {

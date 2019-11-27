@@ -106,11 +106,19 @@ app.component('customerForm', {
         $http.get(
             get_form_data_url
         ).then(function(response) {
-            console.log(response);
+            // console.log(response);
             self.customer = response.data.customer;
+            self.address = response.data.address;
             self.country_list = response.data.country_list;
             self.action = response.data.action;
             $rootScope.loading = false;
+            if (self.action == 'Edit') {
+                $scope.onSelectedCountry(self.address.country_id);
+                $scope.onSelectedState(self.address.state_id);
+            } else {
+                self.state_list = [{ id: '', name: 'Select State' }];
+                self.city_list = [{ 'id': '', 'name': 'Select City' }];
+            }
         });
 
         /* Tab Funtion */
@@ -163,8 +171,10 @@ app.component('customerForm', {
                     maxlength: 255,
                 },
                 'cust_group': {
-                    required: true,
                     maxlength: 100,
+                },
+                'dimension': {
+                    maxlength: 50,
                 },
                 'mobile_no': {
                     required: true,
@@ -190,6 +200,45 @@ app.component('customerForm', {
                     minlength: 6,
                     maxlength: 6,
                 },
+            },
+            messages: {
+                'code': {
+                    maxlength: 'Maximum of 255 charaters',
+                },
+                'name': {
+                    maxlength: 'Maximum of 255 charaters',
+                },
+                'cust_group': {
+                    maxlength: 'Maximum of 100 charaters',
+                },
+                'dimension': {
+                    maxlength: 'Maximum of 50 charaters',
+                },
+                'mobile_no': {
+                    maxlength: 'Maximum of 25 charaters',
+                },
+                'email': {
+                    maxlength: 'Maximum of 100 charaters',
+                },
+                'address_line1': {
+                    maxlength: 'Maximum of 255 charaters',
+                },
+                'address_line2': {
+                    maxlength: 'Maximum of 255 charaters',
+                },
+                'pincode': {
+                    maxlength: 'Maximum of 6 charaters',
+                },
+            },
+            invalidHandler: function(event, validator) {
+                $noty = new Noty({
+                    type: 'error',
+                    layout: 'topRight',
+                    text: 'You have errors,Please check all tabs'
+                }).show();
+                setTimeout(function() {
+                    $noty.close();
+                }, 3000)
             },
             submitHandler: function(form) {
                 let formData = new FormData($(form_id)[0]);
