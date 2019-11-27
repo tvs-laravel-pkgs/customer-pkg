@@ -143,8 +143,14 @@ app.component('customerForm', {
             if (self.action == 'Edit') {
                 $scope.onSelectedCountry(self.address.country_id);
                 $scope.onSelectedState(self.address.state_id);
+                if (self.customer.deleted_at) {
+                    self.switch_value = 'Inactive';
+                } else {
+                    self.switch_value = 'Active';
+                }
             } else {
-                self.state_list = [{ id: '', name: 'Select State' }];
+                self.switch_value = 'Active';
+                self.state_list = [{ 'id': '', 'name': 'Select State' }];
                 self.city_list = [{ 'id': '', 'name': 'Select City' }];
             }
         });

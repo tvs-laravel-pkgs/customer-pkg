@@ -6,6 +6,7 @@ use App\Address;
 use App\Country;
 use App\Http\Controllers\Controller;
 use Auth;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Validator;
@@ -17,13 +18,15 @@ class CustomerController extends Controller {
 	}
 
 	public function getCustomerList(Request $request) {
-		$customer_list = Customer::select(
-			'customers.id',
-			'customers.code',
-			'customers.name',
-			'customers.mobile_no',
-			'customers.email'
-		)
+		$customer_list = Customer::withTrashed()
+			->select(
+				'customers.id',
+				'customers.code',
+				'customers.name',
+				'customers.mobile_no',
+				'customers.email',
+				DB::raw('IF(customers.deleted_at IS NULL,"Active","Inactive") as status')
+			)
 			->where('customers.company_id', Auth::user()->company_id)
 			->where(function ($query) use ($request) {
 				if (!empty($request->customer_code)) {
@@ -48,10 +51,10 @@ class CustomerController extends Controller {
 			->orderby('customers.id', 'desc');
 
 		return Datatables::of($customer_list)
-		// ->addColumn('name', function ($customer_list) {
-		// 	$status = $customer_list->status == 'Active' ? 'green' : 'red';
-		// 	return '<span class="status-indicator ' . $status . '"></span>' . $customer_list->name;
-		// })
+			->addColumn('code', function ($customer_list) {
+				$status = $customer_list->status == 'Active' ? 'green' : 'red';
+				return '<span class="status-indicator ' . $status . '"></span>' . $customer_list->code;
+			})
 			->addColumn('action', function ($customer_list) {
 				$edit_img = asset('public/theme/img/table/cndn/edit.svg');
 				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
@@ -74,7 +77,7 @@ class CustomerController extends Controller {
 			$address = new Address;
 			$action = 'Add';
 		} else {
-			$customer = Customer::find($id);
+			$customer = Customer::withTrashed()->find($id);
 			$address = Address::where('address_of_id', 24)->where('entity_id', $id)->first();
 			$action = 'Edit';
 		}
@@ -87,7 +90,7 @@ class CustomerController extends Controller {
 	}
 
 	public function saveCustomer(Request $request) {
-		// dd($request->all());
+		dd($request->all());
 		try {
 			$error_messages = [
 				'code.required' => 'Customer Code is Required',
@@ -123,13 +126,25 @@ class CustomerController extends Controller {
 			DB::beginTransaction();
 			if (!$request->id) {
 				$customer = new Customer;
+				$customer->created_by_id = Auth::user()->id;
+				$customer->created_at = Carbon::now();
+				$customer->updated_at = NULL;
 				$address = new Address;
 			} else {
-				$customer = Customer::find($request->id);
+				$customer = Customer::withTrashed()->find($request->id);
+				$customer->updated_by_id = Auth::user()->id;
+				$customer->updated_at = Carbon::now();
 				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
 			}
 			$customer->fill($request->all());
 			$customer->company_id = Auth::user()->company_id;
+			if ($request->status == 'Inactive') {
+				$customer->deleted_at = Carbon::now();
+				$customer->deleted_by_id = Auth::user()->id;
+			} else {
+				$customer->deleted_by_id = NULL;
+				$customer->deleted_at = NULL;
+			}
 			$customer->save();
 
 			$address->fill($request->all());
@@ -152,7 +167,7 @@ class CustomerController extends Controller {
 		}
 	}
 	public function deleteCustomer($id) {
-		$delete_status = Customer::where('id', $id)->forceDelete();
+		$delete_status = Customer::withTrashed()->where('id', $id)->forceDelete();
 		if ($delete_status) {
 			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
 			return response()->json(['success' => true]);

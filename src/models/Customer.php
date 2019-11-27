@@ -5,10 +5,11 @@ namespace Abs\CustomerPkg;
 use App\Company;
 use App\Config;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model {
+	use SoftDeletes;
 	protected $table = 'customers';
-	public $timestamps = false;
 	protected $fillable = [
 		'code',
 		'name',
