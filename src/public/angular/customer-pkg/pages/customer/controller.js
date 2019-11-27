@@ -39,7 +39,12 @@ app.component('customerList', {
                 url: laravel_routes['getCustomerList'],
                 type: "GET",
                 dataType: "json",
-                data: function(d) {},
+                data: function(d) {
+                    d.customer_code = $('#customer_code').val();
+                    d.customer_name = $('#customer_name').val();
+                    d.mobile_no = $('#mobile_no').val();
+                    d.email = $('#email').val();
+                },
             },
 
             columns: [
@@ -69,6 +74,7 @@ app.component('customerList', {
             dataTables.fnFilter(this.value);
         });
 
+        //DELETE
         $scope.deleteCustomer = function($id) {
             $('#customer_id').val($id);
         }
@@ -91,6 +97,28 @@ app.component('customerList', {
                 }
             });
         }
+
+        //FOR FILTER
+        $('#customer_code').on('keyup', function() {
+            dataTables.fnFilter();
+        });
+        $('#customer_name').on('keyup', function() {
+            dataTables.fnFilter();
+        });
+        $('#mobile_no').on('keyup', function() {
+            dataTables.fnFilter();
+        });
+        $('#email').on('keyup', function() {
+            dataTables.fnFilter();
+        });
+        $scope.reset_filter = function() {
+            $("#customer_name").val('');
+            $("#customer_code").val('');
+            $("#mobile_no").val('');
+            $("#email").val('');
+            dataTables.fnFilter();
+        }
+
         $rootScope.loading = false;
     }
 });
@@ -138,8 +166,9 @@ app.component('customerForm', {
 
         //SELECT STATE BASED COUNTRY
         $scope.onSelectedCountry = function(id) {
-            $http.get(
-                customer_get_state_list_data + '/' + id
+            customer_get_state_by_country = vendor_get_state_by_country;
+            $http.post(
+                customer_get_state_by_country, { 'country_id': id }
             ).then(function(response) {
                 // console.log(response);
                 self.state_list = response.data.state_list;
@@ -148,8 +177,9 @@ app.component('customerForm', {
 
         //SELECT CITY BASED STATE
         $scope.onSelectedState = function(id) {
-            $http.get(
-                customer_get_city_list_data + '/' + id
+            customer_get_city_by_state = vendor_get_city_by_state
+            $http.post(
+                customer_get_city_by_state, { 'state_id': id }
             ).then(function(response) {
                 // console.log(response);
                 self.city_list = response.data.city_list;

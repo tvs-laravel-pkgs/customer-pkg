@@ -5,7 +5,6 @@ use Abs\CustomerPkg\Customer;
 use App\Address;
 use App\Country;
 use App\Http\Controllers\Controller;
-use App\State;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
@@ -17,7 +16,7 @@ class CustomerController extends Controller {
 	public function __construct() {
 	}
 
-	public function getCustomerList() {
+	public function getCustomerList(Request $request) {
 		$customer_list = Customer::select(
 			'customers.id',
 			'customers.code',
@@ -26,6 +25,26 @@ class CustomerController extends Controller {
 			'customers.email'
 		)
 			->where('customers.company_id', Auth::user()->company_id)
+			->where(function ($query) use ($request) {
+				if (!empty($request->customer_code)) {
+					$query->where('customers.code', 'LIKE', '%' . $request->customer_code . '%');
+				}
+			})
+			->where(function ($query) use ($request) {
+				if (!empty($request->customer_name)) {
+					$query->where('customers.name', 'LIKE', '%' . $request->customer_name . '%');
+				}
+			})
+			->where(function ($query) use ($request) {
+				if (!empty($request->mobile_no)) {
+					$query->where('customers.mobile_no', 'LIKE', '%' . $request->mobile_no . '%');
+				}
+			})
+			->where(function ($query) use ($request) {
+				if (!empty($request->email)) {
+					$query->where('customers.email', 'LIKE', '%' . $request->email . '%');
+				}
+			})
 			->orderby('customers.id', 'desc');
 
 		return Datatables::of($customer_list)
@@ -65,15 +84,6 @@ class CustomerController extends Controller {
 		$this->data['action'] = $action;
 
 		return response()->json($this->data);
-	}
-
-	public function getStateList($id) {
-		$state_list = Country::getState($id);
-		return response()->json($state_list);
-	}
-	public function getCityList($id) {
-		$city_list = State::getCity($id);
-		return response()->json($city_list);
 	}
 
 	public function saveCustomer(Request $request) {
