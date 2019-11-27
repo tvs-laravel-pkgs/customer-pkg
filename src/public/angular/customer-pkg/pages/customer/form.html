@@ -101,7 +101,7 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>Country <sup class="mandatory">*</sup></label>
-                                                <md-select ng-model="$ctrl.address.country_id" ng-change="onSelectedCountry($ctrl.address.country_id)" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
+                                                <md-select ng-model="$ctrl.address.country_id" ng-change="onSelectedCountry($ctrl.address.country_id);$ctrl.address.state_id='';$ctrl.address.city_id=''" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
                                                         <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
@@ -115,7 +115,7 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>State <sup class="mandatory">*</sup></label>
-                                                <md-select ng-model="$ctrl.address.state_id" ng-change="onSelectedState($ctrl.address.state_id)" placeholder="Select State" data-md-container-class="selectdemoSelectHeader">
+                                                <md-select ng-model="$ctrl.address.state_id" ng-change="onSelectedState($ctrl.address.state_id);$ctrl.address.city_id=''" placeholder="Select State" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
                                                         <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
