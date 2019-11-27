@@ -13,27 +13,27 @@ class CustomerPermissionSeeder extends Seeder {
 	public function run() {
 		$permissions = [
 			//MASTER > CUSTOMERS
-			4400 => [
+			4600 => [
 				'display_order' => 10,
-				'parent_id' => 2,
+				'parent_id' => null,
 				'name' => 'customers',
 				'display_name' => 'Customers',
 			],
-			4401 => [
+			4601 => [
 				'display_order' => 1,
-				'parent_id' => 4400,
+				'parent_id' => 4600,
 				'name' => 'add-customer',
 				'display_name' => 'Add',
 			],
-			4402 => [
+			4602 => [
 				'display_order' => 2,
-				'parent_id' => 4400,
+				'parent_id' => 4600,
 				'name' => 'edit-customer',
 				'display_name' => 'Edit',
 			],
-			4403 => [
+			4603 => [
 				'display_order' => 3,
-				'parent_id' => 4400,
+				'parent_id' => 4600,
 				'name' => 'delete-customer',
 				'display_name' => 'Delete',
 			],
