@@ -147,6 +147,10 @@ class CustomerController extends Controller {
 			}
 			$customer->save();
 
+			if (!$address) {
+				$address = new Address;
+
+			}
 			$address->fill($request->all());
 			$address->company_id = Auth::user()->company_id;
 			$address->address_of_id = 24;
