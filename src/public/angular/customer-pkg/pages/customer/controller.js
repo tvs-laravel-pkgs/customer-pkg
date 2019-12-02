@@ -209,19 +209,12 @@ app.component('customerForm', {
                 'cust_group': {
                     maxlength: 100,
                 },
+                'gst_number': {
+                    required: true,
+                    maxlength: 100,
+                },
                 'dimension': {
                     maxlength: 50,
-                },
-                'mobile_no': {
-                    required: true,
-                    minlength: 10,
-                    maxlength: 25,
-                },
-                'email': {
-                    required: true,
-                    email: true,
-                    minlength: 6,
-                    maxlength: 255,
                 },
                 'address_line1': {
                     minlength: 3,
@@ -250,7 +243,7 @@ app.component('customerForm', {
                 'dimension': {
                     maxlength: 'Maximum of 50 charaters',
                 },
-                'mobile_no': {
+                'gst_number': {
                     maxlength: 'Maximum of 25 charaters',
                 },
                 'email': {

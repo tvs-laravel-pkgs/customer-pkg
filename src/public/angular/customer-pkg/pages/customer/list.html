@@ -57,9 +57,6 @@
             <div class="modal-header">
                 <button type="button" class="close ripple" data-dismiss="modal" aria-label="Close"><i class="icon ion-md-close"></i></button>
                 <h5 class="modal-title" id="myModalLabel">Customer Filter</h5>
-                <div class="filter-reset pull-right">
-                    <p class="text-red" ng-click="reset_filter()">Reset Filter</p>
-                </div>
             </div><!-- Modal Header -->
             <div class="modal-body">
                 <div class="modal-form">
@@ -88,6 +85,9 @@
                                 <input type="text" class="form-control" id="email" name="email" placeholder="Enter Email" autocomplete="off">
                             </div><!-- Field -->
                         </div><!-- Column -->
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-rose" ng-click="reset_filter()">Reset Filter</button>
+                        </div>
                     </div><!-- Row -->
                 </div><!-- Modal Form -->
             </div><!-- Modal Body -->

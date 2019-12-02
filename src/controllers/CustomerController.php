@@ -23,8 +23,8 @@ class CustomerController extends Controller {
 				'customers.id',
 				'customers.code',
 				'customers.name',
-				'customers.mobile_no',
-				'customers.email',
+				DB::raw('IF(customers.mobile_no IS NULL,"--",customers.mobile_no) as mobile_no'),
+				DB::raw('IF(customers.email IS NULL,"--",customers.email) as email'),
 				DB::raw('IF(customers.deleted_at IS NULL,"Active","Inactive") as status')
 			)
 			->where('customers.company_id', Auth::user()->company_id)
@@ -99,9 +99,10 @@ class CustomerController extends Controller {
 				'name.required' => 'Customer Name is Required',
 				'name.max' => 'Maximum 255 Characters',
 				'name.min' => 'Minimum 3 Characters',
-				'mobile_no.required' => 'Mobile Number is Required',
+				'gst_number.required' => 'GST Number is Required',
+				'gst_number.max' => 'Maximum 191 Numbers',
 				'mobile_no.max' => 'Maximum 25 Numbers',
-				'email.required' => 'Email is Required',
+				// 'email.required' => 'Email is Required',
 				'address_line1.required' => 'Address Line 1 is Required',
 				'address_line1.max' => 'Maximum 255 Characters',
 				'address_line1.min' => 'Minimum 3 Characters',
@@ -113,8 +114,9 @@ class CustomerController extends Controller {
 			$validator = Validator::make($request->all(), [
 				'code' => 'required|max:255|min:3',
 				'name' => 'required|max:255|min:3',
-				'mobile_no' => 'required|max:25',
-				'email' => 'required',
+				'gst_number' => 'required|max:191',
+				'mobile_no' => 'nullable|max:25',
+				// 'email' => 'nullable',
 				'address_line1' => 'required|max:255|min:3',
 				'address_line2' => 'max:255',
 				'pincode' => 'required|max:6|min:6',
@@ -145,6 +147,7 @@ class CustomerController extends Controller {
 				$customer->deleted_by_id = NULL;
 				$customer->deleted_at = NULL;
 			}
+			$customer->gst_number = $request->gst_number;
 			$customer->save();
 
 			if (!$address) {
