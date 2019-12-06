@@ -79,6 +79,9 @@ class CustomerController extends Controller {
 		} else {
 			$customer = Customer::withTrashed()->find($id);
 			$address = Address::where('address_of_id', 24)->where('entity_id', $id)->first();
+			if (!$address) {
+				$address = new Address;
+			}
 			$action = 'Edit';
 		}
 		$this->data['country_list'] = $country_list = Collect(Country::select('id', 'name')->get())->prepend(['id' => '', 'name' => 'Select Country']);
@@ -152,7 +155,6 @@ class CustomerController extends Controller {
 
 			if (!$address) {
 				$address = new Address;
-
 			}
 			$address->fill($request->all());
 			$address->company_id = Auth::user()->company_id;
