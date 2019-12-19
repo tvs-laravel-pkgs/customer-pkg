@@ -110,9 +110,9 @@ class CustomerController extends Controller {
 				'address_line1.max' => 'Maximum 255 Characters',
 				'address_line1.min' => 'Minimum 3 Characters',
 				'address_line2.max' => 'Maximum 255 Characters',
-				'pincode.required' => 'Pincode is Required',
-				'pincode.max' => 'Maximum 6 Characters',
-				'pincode.min' => 'Minimum 6 Characters',
+				// 'pincode.required' => 'Pincode is Required',
+				// 'pincode.max' => 'Maximum 6 Characters',
+				// 'pincode.min' => 'Minimum 6 Characters',
 			];
 			$validator = Validator::make($request->all(), [
 				'code' => 'required|max:255|min:3',
@@ -122,7 +122,7 @@ class CustomerController extends Controller {
 				// 'email' => 'nullable',
 				'address_line1' => 'required|max:255|min:3',
 				'address_line2' => 'max:255',
-				'pincode' => 'required|max:6|min:6',
+				// 'pincode' => 'required|max:6|min:6',
 			], $error_messages);
 			if ($validator->fails()) {
 				return response()->json(['success' => false, 'errors' => $validator->errors()->all()]);

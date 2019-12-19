@@ -224,11 +224,11 @@ app.component('customerForm', {
                     minlength: 3,
                     maxlength: 255,
                 },
-                'pincode': {
-                    required: true,
-                    minlength: 6,
-                    maxlength: 6,
-                },
+                // 'pincode': {
+                //     required: true,
+                //     minlength: 6,
+                //     maxlength: 6,
+                // },
             },
             messages: {
                 'code': {
@@ -255,9 +255,9 @@ app.component('customerForm', {
                 'address_line2': {
                     maxlength: 'Maximum of 255 charaters',
                 },
-                'pincode': {
-                    maxlength: 'Maximum of 6 charaters',
-                },
+                // 'pincode': {
+                //     maxlength: 'Maximum of 6 charaters',
+                // },
             },
             invalidHandler: function(event, validator) {
                 $noty = new Noty({
