@@ -160,9 +160,15 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>Pincode</label>
-                                                <input type="text" class="form-control required" ng-model="$ctrl.address.pincode" name="pincode" placeholder="Enter Pincode" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                                <input type="text" class="form-control" ng-model="$ctrl.address.pincode" name="pincode" placeholder="Enter Pincode" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label class="table-form-list-label">Full Address<span class="mandatory">*</span></label>
+                                                <textarea name="address" ng-model="$ctrl.customer.address" class="form-control required" rows="3" placeholder="Enter Address"></textarea>
+                                            </div>
+                                        </div>
                                         <div class="tab-pane-footer">
                                             <div class="row">
                                                 <div class="col-md-12">

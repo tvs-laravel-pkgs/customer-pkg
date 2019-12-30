@@ -216,6 +216,11 @@ app.component('customerForm', {
                 'dimension': {
                     maxlength: 50,
                 },
+                'address': {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 250,
+                },
                 'address_line1': {
                     minlength: 3,
                     maxlength: 255,

@@ -120,6 +120,7 @@ class CustomerController extends Controller {
 				'gst_number' => 'required|max:191',
 				'mobile_no' => 'nullable|max:25',
 				// 'email' => 'nullable',
+				'address' => 'required',
 				'address_line1' => 'required|max:255|min:3',
 				'address_line2' => 'max:255',
 				// 'pincode' => 'required|max:6|min:6',
