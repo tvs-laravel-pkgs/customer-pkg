@@ -2,12 +2,14 @@
 
 namespace Abs\CustomerPkg;
 
+use Abs\HelperPkg\Traits\SeederTrait;
 use App\Company;
 use App\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model {
+	use SeederTrait;
 	use SoftDeletes;
 	protected $table = 'customers';
 	protected $fillable = [
@@ -53,19 +55,6 @@ class Customer extends Model {
 		$record->created_by_id = $admin->id;
 		$record->save();
 		return $record;
-	}
-
-	public static function createFromCollection($records) {
-		foreach ($records as $key => $record_data) {
-			try {
-				if (!$record_data->company) {
-					continue;
-				}
-				$record = self::createFromObject($record_data);
-			} catch (Exception $e) {
-				dd($e);
-			}
-		}
 	}
 
 }
