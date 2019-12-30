@@ -20,6 +20,7 @@ class Customer extends Model {
 		'mobile_no',
 		'email',
 		'company_id',
+		'address',
 	];
 
 	public static function createFromObject($record_data) {
