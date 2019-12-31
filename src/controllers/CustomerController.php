@@ -152,6 +152,7 @@ class CustomerController extends Controller {
 				$customer->deleted_at = NULL;
 			}
 			$customer->gst_number = $request->gst_number;
+			$customer->axapta_location_id = $request->axapta_location_id;
 			$customer->save();
 
 			if (!$address) {
