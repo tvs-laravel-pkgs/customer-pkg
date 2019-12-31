@@ -99,6 +99,7 @@ class CustomerController extends Controller {
 				'code.required' => 'Customer Code is Required',
 				'code.max' => 'Maximum 255 Characters',
 				'code.min' => 'Minimum 3 Characters',
+				'code.unique' => 'Customer Code is already taken',
 				'name.required' => 'Customer Name is Required',
 				'name.max' => 'Maximum 255 Characters',
 				'name.min' => 'Minimum 3 Characters',
@@ -115,7 +116,12 @@ class CustomerController extends Controller {
 				// 'pincode.min' => 'Minimum 6 Characters',
 			];
 			$validator = Validator::make($request->all(), [
-				'code' => 'required|max:255|min:3',
+				'code' => [
+					'required:true',
+					'max:255',
+					'min:3',
+					'unique:customers,code,' . $request->id . ',id,company_id,' . Auth::user()->company_id,
+				],
 				'name' => 'required|max:255|min:3',
 				'gst_number' => 'required|max:191',
 				'mobile_no' => 'nullable|max:25',
