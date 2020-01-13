@@ -12,6 +12,7 @@ class Customer extends Model {
 	use SeederTrait;
 	use SoftDeletes;
 	protected $table = 'customers';
+	public $timestamps = true;
 	protected $fillable = [
 		'code',
 		'name',

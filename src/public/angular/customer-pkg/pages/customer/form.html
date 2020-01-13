@@ -5,11 +5,18 @@
         <div class="page-header-inner">
             <div class="page-header-content-left">
                 <div class="page-header-content button-block">
-                    <a href="#!/customer-pkg/customer/list" type="button" class="btn-back btn-img"><img class="img-responsive" src="./public/theme/img/content/previous.svg" alt="Back" /></a>
+                    <a href="#!/customer-pkg/customer/list" type="button" class="btn-back btn-img">
+                        <img class="img-responsive" src="./public/theme/img/content/previous.svg" alt="Back" />
+                    </a>
                 </div><!-- Page Header Content -->
                 <div class="page-header-content title-block">
                     <h1 class="title"><b>{{$ctrl.action}} Customer</b></h1>
-                    <p class="subtitle"><a href="#!/customer-pkg/customer/list">Customer List</a> / {{$ctrl.action}}</p>
+                    <p class="subtitle">
+                        <a href="#!/customer-pkg/customer/list">
+                            Customer List
+                        </a> /
+                        {{$ctrl.action}}
+                    </p>
                 </div><!-- Page Header Content -->
             </div><!-- Page Header Content Left -->
         </div><!-- Page Header Inner -->
@@ -25,8 +32,16 @@
                             <!-- Filters -->
                             <div class="isotope-filters animated" data-animation="fadeInLeft" data-animation-delay="300">
                                 <ul class="nav nav-pills cndn-tabs">
-                                    <li class="active"><a class="filter active" data-target="#general-information" data-toggle="tab" aria-expanded="true">General Information</a></li>
-                                    <li><a data-target="#address-details" data-toggle="tab" aria-expanded="true" class="filter">Address Details</a></li>
+                                    <li class="active">
+                                        <a class="filter active" data-target="#general-information" data-toggle="tab" aria-expanded="true">
+                                            General Information
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a data-target="#address-details" data-toggle="tab" aria-expanded="true" class="filter">
+                                            Address Details
+                                        </a>
+                                    </li>
                                 </ul>
                             </div><!-- Filters -->
                         </div><!-- Tab Header -->
@@ -39,19 +54,28 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Customer Code <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    Customer Code
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <input type="text" class="form-control required" ng-model="$ctrl.customer.code" name="code" placeholder="Enter Customer Code" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Customer Name <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    Customer Name
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <input type="text" class="form-control required" ng-model="$ctrl.customer.name" name="name" placeholder="Enter Customer Name" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>GST Number <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    GST Number
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <input type="text" class="form-control required" ng-model="$ctrl.customer.gst_number" name="gst_number" placeholder="Enter GST Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
@@ -87,7 +111,10 @@
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Active Status <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    Active Status
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <div class="tab-switch">
                                                     <md-switch ng-model="$ctrl.switch_value" aria-label="Switch 1" ng-true-value="'Inactive'" ng-false-value="'Active'" class="md-warn">
                                                         {{ $ctrl.switch_value }}
@@ -99,7 +126,9 @@
                                         <div class="tab-pane-footer">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <a class="btn btn-primary btn-nxt">Next</a>
+                                                    <a class="btn btn-primary btn-nxt">
+                                                        Next
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div><!-- Tab Footer -->
@@ -111,25 +140,35 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Address Line 1 <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    Address Line 1
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <input type="text" class="form-control required" ng-model="$ctrl.address.address_line1" name="address_line1" placeholder="Enter Address Line 1" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Address Line 2</label>
+                                                <label>
+                                                    Address Line 2
+                                                </label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.address.address_line2" name="address_line2" placeholder="Enter Address Line 2" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Country <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    Country
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <md-select ng-model="$ctrl.address.country_id" ng-change="onSelectedCountry($ctrl.address.country_id);$ctrl.address.state_id='';$ctrl.address.city_id=''" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
                                                         <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
                                                     <md-optgroup label="Customer Group List">
-                                                        <md-option ng-value="country.id" ng-repeat="country in $ctrl.country_list | filter:searchTravel">{{country.name}}</md-option>
+                                                        <md-option ng-value="country.id" ng-repeat="country in $ctrl.country_list | filter:searchTravel">
+                                                            {{country.name}}
+                                                        </md-option>
                                                     </md-optgroup>
                                                 </md-select>
                                                 <input type="hidden" name="country_id" value='{{$ctrl.address.country_id}}' class="required">
@@ -137,13 +176,18 @@
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>State <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    State
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <md-select ng-model="$ctrl.address.state_id" ng-change="onSelectedState($ctrl.address.state_id);$ctrl.address.city_id=''" placeholder="Select State" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
                                                         <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
                                                     <md-optgroup label="">
-                                                        <md-option ng-value="state.id" ng-repeat="state in $ctrl.state_list | filter:searchTravel">{{state.name}}</md-option>
+                                                        <md-option ng-value="state.id" ng-repeat="state in $ctrl.state_list | filter:searchTravel">
+                                                            {{state.name}}
+                                                        </md-option>
                                                     </md-optgroup>
                                                 </md-select>
                                                 <input type="hidden" name="state_id" value='{{$ctrl.address.state_id}}' class="required">
@@ -151,13 +195,18 @@
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>City <sup class="mandatory">*</sup></label>
+                                                <label>
+                                                    City
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
                                                 <md-select ng-model="$ctrl.address.city_id" placeholder="Select City" data-md-container-class="selectdemoSelectHeader">
                                                     <md-select-header class="demo-select-header ng-hide">
                                                         <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
                                                     </md-select-header>
                                                     <md-optgroup label="">
-                                                        <md-option ng-value="city.id" ng-repeat="city in $ctrl.city_list | filter:searchTravel">{{city.name}}</md-option>
+                                                        <md-option ng-value="city.id" ng-repeat="city in $ctrl.city_list | filter:searchTravel">
+                                                            {{city.name}}
+                                                        </md-option>
                                                     </md-optgroup>
                                                 </md-select>
                                                 <input type="hidden" name="city_id" value='{{$ctrl.address.city_id}}' class="required">
@@ -165,21 +214,30 @@
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Pincode</label>
+                                                <label>
+                                                    Pincode
+                                                </label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.address.pincode" name="pincode" placeholder="Enter Pincode" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label class="table-form-list-label">Full Address<span class="mandatory">*</span></label>
+                                                <label class="table-form-list-label">
+                                                    Full Address
+                                                    <span class="mandatory">*</span>
+                                                </label>
                                                 <textarea name="address" ng-model="$ctrl.customer.address" class="form-control required" rows="3" placeholder="Enter Address"></textarea>
                                             </div>
                                         </div>
                                         <div class="tab-pane-footer">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <a class="btn btn-secondary btn-prev">Previous</a>
-                                                    <button type="submit" id="submit" class="btn btn-primary">Submit</button>
+                                                    <a class="btn btn-secondary btn-prev">
+                                                        Previous
+                                                    </a>
+                                                    <button type="submit" id="submit" class="btn btn-primary">
+                                                        Submit
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div><!-- Tab Footer -->

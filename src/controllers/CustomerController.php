@@ -18,7 +18,7 @@ class CustomerController extends Controller {
 	}
 
 	public function getCustomerList(Request $request) {
-		$customer_list = Customer::withTrashed()
+		$customers = Customer::withTrashed()
 			->select(
 				'customers.id',
 				'customers.code',
@@ -50,20 +50,20 @@ class CustomerController extends Controller {
 			})
 			->orderby('customers.id', 'desc');
 
-		return Datatables::of($customer_list)
-			->addColumn('code', function ($customer_list) {
-				$status = $customer_list->status == 'Active' ? 'green' : 'red';
-				return '<span class="status-indicator ' . $status . '"></span>' . $customer_list->code;
+		return Datatables::of($customers)
+			->addColumn('code', function ($customer) {
+				$status = $customer->status == 'Active' ? 'green' : 'red';
+				return '<span class="status-indicator ' . $status . '"></span>' . $customer->code;
 			})
-			->addColumn('action', function ($customer_list) {
+			->addColumn('action', function ($customer) {
 				$edit_img = asset('public/theme/img/table/cndn/edit.svg');
 				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
 				return '
-					<a href="#!/customer-pkg/customer/edit/' . $customer_list->id . '">
+					<a href="#!/customer-pkg/customer/edit/' . $customer->id . '">
 						<img src="' . $edit_img . '" alt="View" class="img-responsive">
 					</a>
 					<a href="javascript:;" data-toggle="modal" data-target="#delete_customer"
-					onclick="angular.element(this).scope().deleteCustomer(' . $customer_list->id . ')" dusk = "delete-btn" title="Delete">
+					onclick="angular.element(this).scope().deleteCustomer(' . $customer->id . ')" dusk = "delete-btn" title="Delete">
 					<img src="' . $delete_img . '" alt="delete" class="img-responsive">
 					</a>
 					';
