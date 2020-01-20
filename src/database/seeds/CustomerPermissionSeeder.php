@@ -12,40 +12,33 @@ class CustomerPermissionSeeder extends Seeder {
 	 */
 	public function run() {
 		$permissions = [
-			//MASTER > CUSTOMERS
-			4600 => [
-				'display_order' => 10,
-				'parent_id' => null,
+			//CUSTOMERS
+			[
+				'display_order' => 99,
+				'parent' => null,
 				'name' => 'customers',
 				'display_name' => 'Customers',
 			],
-			4601 => [
+			[
 				'display_order' => 1,
-				'parent_id' => 4600,
+				'parent' => 'customers',
 				'name' => 'add-customer',
 				'display_name' => 'Add',
 			],
-			4602 => [
+			[
 				'display_order' => 2,
-				'parent_id' => 4600,
-				'name' => 'edit-customer',
+				'parent' => 'customers',
+				'name' => 'delete-customer',
 				'display_name' => 'Edit',
 			],
-			4603 => [
+			[
 				'display_order' => 3,
-				'parent_id' => 4600,
+				'parent' => 'customers',
 				'name' => 'delete-customer',
 				'display_name' => 'Delete',
 			],
 
 		];
-
-		foreach ($permissions as $permission_id => $permsion) {
-			$permission = Permission::firstOrNew([
-				'id' => $permission_id,
-			]);
-			$permission->fill($permsion);
-			$permission->save();
-		}
+		Permission::createFromArrays($permissions);
 	}
 }

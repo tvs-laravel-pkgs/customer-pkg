@@ -1,7 +1,6 @@
 app.config(['$routeProvider', function($routeProvider) {
 
     $routeProvider.
-    //CUSTOMER
     when('/customer-pkg/customer/list', {
         template: '<customer-list></customer-list>',
         title: 'Customers',
