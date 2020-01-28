@@ -123,7 +123,7 @@ class CustomerController extends Controller {
 					'unique:customers,code,' . $request->id . ',id,company_id,' . Auth::user()->company_id,
 				],
 				'name' => 'required|max:255|min:3',
-				'gst_number' => 'required|max:191',
+				'gst_number' => 'nullable|max:191',
 				'mobile_no' => 'nullable|max:25',
 				// 'email' => 'nullable',
 				'address' => 'required',

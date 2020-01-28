@@ -227,8 +227,7 @@ app.component('customerForm', {
                     maxlength: 100,
                 },
                 'gst_number': {
-                    required: true,
-                    maxlength: 100,
+                    maxlength: 20,
                 },
                 'dimension': {
                     maxlength: 50,

@@ -1,0 +1,175 @@
+<!-- Content Wrap -->
+<div class="login-wrap">
+    <!-- Page Main Content -->
+    <div class="page-main-content">
+        <div class="container">
+            <div class="row flex-row">
+                <div class="col-md-6 bg-login">
+                    <div class="bg-login-content partsmart">
+                        <div class="center-align">
+                            <p class="img-center-title">Welcome to</p>
+                            <img src="/public/themes/'.$theme.'/img/partsmart_logo.svg" class="img-responsive" style="margin-right: 0;">
+                            <small>V1.0.0</small>
+                        </div>
+                    </div><!-- Background Login Content -->
+                </div><!-- Column -->
+                <div class="col-md-6 login-responsive">
+                    <div class="login-content">
+                        <div class="login-box">
+                            <div class="img-center">
+                                <img src="/public/themes/'.$theme.'/img/partsmart_logo.svg" class="img-responsive">
+                            </div><!-- Img Center -->
+                            <form method="POST" id="login-form">
+                                <div class="tvs-logo">
+                                    <img src="{{/public/themes/'.$theme.'/img/TVS-AUTO.svg" class="img-responsive">
+                                </div>
+                                <div class="form-group ">
+                                    <div class="input-group pb-1">
+                                        <span class="input-group-addon">
+                                            <img class="img-responsive" src="/public/themes/'.$theme.'/img/bg/user.svg" />
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Username" name="username" value="" dusk="username">
+                                    </div><!-- /input-group -->
+                                </div><!-- Feild -->
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <span class="input-group-addon"><img class="img-responsive" src="/public/themes/'.$theme.'/img/bg/password.svg" /></span>
+                                    <input type="password" class="form-control" placeholder="Password" name="password" value="" id="password" data-toggle="password" required dusk="password">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-eye" type="button" onclick="if(password.type == 'text') password.type = 'password';else password.type = 'text';">
+                                            <img src="/public/themes/'.$theme.'/img/bg/eye.svg" class="img-responsive">
+                                    </button>
+                                    </span>
+                                </div><!-- /input-group -->
+                        </div><!-- Feild -->
+                        <div class=" login-action">
+                                    <div class="login-forgot">
+                                        <a href="#!" class="forgot-pass">
+                                            Forgot Password?
+                                        </a>
+                                    </div>
+                                </div>
+                                <button type="submit" id="submit" class="btn btn-login" dusk="login-btn">
+                                    Login
+                                </button>
+                            </form>
+                        </div><!-- Login Inbox -->
+                        <!-- Login Right -->
+                        <div class="login-right pass-none">
+                            <div class="login-title">
+                                <h4 class="title">Forgot Password</h4>
+                            </div>
+                            <!-- Form -->
+                            <form class="forgot-form" id="checkMobileNumber">                                
+                                <div class="form-group">
+                                    <div class="input-text input-group">
+                                        <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
+                                        <input type="text" class="form-control contact_number" id="contact_number" name="contact_number" placeholder="Enter Mobile Number" required="">
+                                    </div><!-- Field -->
+                                    <div class="error_texts"></div>
+                                </div>
+                                <ul class="login-action">
+                                    <li>
+                                        <button class="btn btn-back" id="btn-forgot" type="button">
+                                            Cancel
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="btn btn-otp" id="confirmation-link" type="submit">
+                                            Send OTP
+                                        </button>
+                                    </li>
+                                </ul>
+                            </form>
+                        </div><!-- Login Right -->
+                        <!-- Login Right -->
+                        <div class="login-right pass-next">
+                            <div class="login-title">
+                                <h4 class="title">Enter OTP</h4>
+                            </div>
+                            <!-- Form -->
+                            <form class="confirmation-form" id="confirmOTP">
+                                @csrf
+                                <div class="form-group">
+                                    <div class="input-text input-group">
+                                        <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
+                                        <input type="hidden" name="user_id" id="user_id1">
+                                        <input type="password" id="otp_no" name="otp_no" class="form-control otp_no" placeholder="Enter OTP" required="required" maxlength="6" minlength="6" autocomplete="false" />
+                                    </div><!-- Field -->
+                                    <div class="otp_error_texts"></div>
+                                </div>
+                                <ul class="login-action">
+                                    <li>
+                                        <button class="btn btn-back-two" type="button">
+                                            Cancel
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="btn btn-next" type="submit" id="password-link">
+                                            Verify
+                                        </button>
+                                    </li>
+                                </ul>
+                            </form>
+                        </div><!-- Login Right -->
+                        <!-- Login Right -->
+                        <div class="login-right pass-confirm">
+                            <div class="login-title">
+                                <h4 class="title">Enter Password</h4>
+                            </div>
+                            <!-- Form -->
+                            <form class="password-form" id="setPassword" method="POST" action="">
+                                @csrf
+                                <div class="form-group">
+                                    <label>New Password</label>
+                                    <div class="input-text input-group">
+                                        <span class="input-group-addon"><img class="img-responsive" src="/public/themes/'.$theme.'/img/bg/password.svg" /></span>
+                                    <input type="hidden" name="user_id" id="user_id2">
+                                    <input type="password" class="form-control password" name="password" id="old_password" placeholder="Enter New Password" autocomplete="false">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-eye old_pass_toggle" type="button">
+                                            <img src="/public/themes/'.$theme.'/img/bg/eye.svg" class="img-responsive">
+                                    </button>
+                                    </span>
+                                </div><!-- Field -->
+                                <div class="password_error_text color-red"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <div class="input-text input-group">
+                                <span class="input-group-addon"><img class="img-responsive" src="/public/themes/'.$theme.'/img/bg/password.svg" /></span>
+                                <input type="password" class="form-control confirm_password" name="confirm_password" id="confirm_password" placeholder="Enter Confirm Password" autocomplete="false">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-eye confi_pass_toggle" type="button">
+                                        <img src="/public/themes/'.$theme.'/img/bg/eye.svg" class="img-responsive">
+                                    </button>
+                                    </span>
+                                </div><!-- Field -->
+                                <div class="confirm_password_error_text color-red"></div>
+                        </div>
+                        <ul class="login-action">
+                            <li>
+                                <button class="btn btn-back-three" type="button">
+                                    Cancel
+                                </button>
+                            </li>
+                            <li>
+                                <button class="btn btn-confirm" id="set-password-link" type="submit">
+                                    confirm
+                                </button>
+                            </li>
+                        </ul>
+                        </form>
+                    </div><!-- Login Right -->
+                </div><!-- Login Content -->
+                <div class="login-footer">
+                    <p class="footer-description"> Powered by</p>
+                    <div class="footer-logo">
+                        <img class="img-responsive" src="/public/themes/'.$theme.'/img/uitoux.png">
+                                </div><!-- Footer Log -->
+                        </div><!-- Login Footer -->
+                    </div><!-- Column -->
+                </div><!-- Row -->
+            </div><!-- Container -->
+        </div><!-- Page Main Content -->
+    </div><!-- Content Wrap -->
