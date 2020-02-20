@@ -4,6 +4,7 @@ namespace Abs\CustomerPkg;
 use Abs\CustomerPkg\Customer;
 use App\Address;
 use App\Country;
+use App\CustomerDetails;
 use App\Http\Controllers\Controller;
 use Auth;
 use Carbon\Carbon;
@@ -75,12 +76,19 @@ class CustomerController extends Controller {
 		if (!$id) {
 			$customer = new Customer;
 			$address = new Address;
+			$customer_details = new CustomerDetails;
 			$action = 'Add';
 		} else {
 			$customer = Customer::withTrashed()->find($id);
 			$address = Address::where('address_of_id', 24)->where('entity_id', $id)->first();
+			//Add Pan && Aadhar to Customer details by Karthik Kumar on 19-02-2020
+			$customer_details = CustomerDetails::where('customer_id', $id)->first();
 			if (!$address) {
 				$address = new Address;
+			}
+			//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
+			if (!$customer_details) {
+				$customer_details = new CustomerDetails;
 			}
 			$action = 'Edit';
 		}
@@ -88,12 +96,13 @@ class CustomerController extends Controller {
 		$this->data['customer'] = $customer;
 		$this->data['address'] = $address;
 		$this->data['action'] = $action;
+		$this->data['customer_details'] = $customer_details;
 
 		return response()->json($this->data);
 	}
 
 	public function saveCustomer(Request $request) {
-		// dd($request->all());
+
 		try {
 			$error_messages = [
 				'code.required' => 'Customer Code is Required',
@@ -142,11 +151,14 @@ class CustomerController extends Controller {
 				$customer->created_at = Carbon::now();
 				$customer->updated_at = NULL;
 				$address = new Address;
+				$customer_details = new CustomerDetails;
 			} else {
 				$customer = Customer::withTrashed()->find($request->id);
 				$customer->updated_by_id = Auth::user()->id;
 				$customer->updated_at = Carbon::now();
 				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
+				$customer_details = CustomerDetails::where('customer_id', $request->id)->first();
 			}
 			$customer->fill($request->all());
 			$customer->company_id = Auth::user()->company_id;
@@ -171,6 +183,14 @@ class CustomerController extends Controller {
 			$address->address_type_id = 40;
 			$address->name = 'Primary Address';
 			$address->save();
+			//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
+			if (!$customer_details) {
+				$customer_details = new CustomerDetails;
+			}
+			$customer_details->pan_no = $request->pan_no;
+			$customer_details->aadhar_no = $request->aadhar_no;
+			$customer_details->customer_id = $customer->id;
+			$customer_details->save();
 
 			DB::commit();
 			if (!($request->id)) {
@@ -187,6 +207,7 @@ class CustomerController extends Controller {
 		$delete_status = Customer::withTrashed()->where('id', $id)->forceDelete();
 		if ($delete_status) {
 			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
+			$customer_details_delete = CustomerDetail::where('customer_id', $id)->forceDelete();
 			return response()->json(['success' => true]);
 		}
 	}

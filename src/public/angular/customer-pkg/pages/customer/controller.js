@@ -139,6 +139,7 @@ app.component('customerForm', {
             self.address = response.data.address;
             self.country_list = response.data.country_list;
             self.action = response.data.action;
+            self.customer_details = response.data.customer_details;
             $rootScope.loading = false;
             if (self.action == 'Edit') {
                 $scope.onSelectedCountry(self.address.country_id);
