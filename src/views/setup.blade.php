@@ -8,7 +8,7 @@
 	app.config(['$routeProvider', function($routeProvider) {
 
 	    $routeProvider.
-	    when('/customer-pkg/customer/list', {
+	    when('/customer-pkg/customers/list', {
 	        template: '<customer-list></customer-list>',
 	        title: 'Customers',
 	    }).

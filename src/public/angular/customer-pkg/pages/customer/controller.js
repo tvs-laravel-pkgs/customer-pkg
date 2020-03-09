@@ -1,10 +1,22 @@
 app.component('customerList', {
     templateUrl: customer_list_template_url,
-    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
+    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location,$cookies) {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
         var table_scroll;
+        $('#search_customer').focus();
+         search_customer = $cookies.get('search_customer');
+         $('#search_customer').val(search_customer);
+         customer_code = $cookies.get('customer_code');
+         $('#customer_code').val(customer_code);
+         customer_name = $cookies.get('customer_name');
+         $('#customer_name').val(customer_name);
+         mobile_no = $cookies.get('mobile_no');
+         $('#mobile_no').val(mobile_no);
+         email = $cookies.get('email');
+         $('#email').val(email);
+         //console.log(typeof(search_customer));
         table_scroll = $('.page-main-content').height() - 37;
         var dataTable = $('#customers_list').DataTable({
             "dom": cndn_dom_structure,
@@ -29,11 +41,12 @@ app.component('customerList', {
                 }
                 return JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
             },
-            serverSide: true,
+           serverSide: true,
             paging: true,
             stateSave: true,
-            ordering: false,
-            scrollY: table_scroll + "px",
+            ordering: true,
+            sorting:true,
+             scrollY: table_scroll + "px",
             scrollCollapse: true,
             ajax: {
                 url: laravel_routes['getCustomerList'],
@@ -46,13 +59,12 @@ app.component('customerList', {
                     d.email = $('#email').val();
                 },
             },
-
             columns: [
-                { data: 'action', class: 'action', name: 'action', searchable: false },
-                { data: 'code', name: 'customers.code' },
-                { data: 'name', name: 'customers.name' },
-                { data: 'mobile_no', name: 'customers.mobile_no' },
-                { data: 'email', name: 'customers.email' },
+                { data: 'action', class: 'action', "name": 'action', searchable: false },
+                { data: 'code', "name": 'code' },
+                { data: 'name', "name": 'name', sortable: true },
+                { data: 'mobile_no', "name": 'mobile_no' },
+                { data: 'email', "name": 'email' },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
                 $('#table_info').html(total)
@@ -66,14 +78,18 @@ app.component('customerList', {
 
         $scope.clear_search = function() {
             $('#search_customer').val('');
+            $cookies.put('search_customer', $('#search_customer').val());
             $('#customers_list').DataTable().search('').draw();
         }
 
         var dataTables = $('#customers_list').dataTable();
         $("#search_customer").keyup(function() {
+            $cookies.put('search_customer', $('#search_customer').val());
             dataTables.fnFilter(this.value);
         });
-
+        $scope.statusChange=function(){
+            dataTables.fnFilter();
+        }
         //DELETE
         $scope.deleteCustomer = function($id) {
             $('#customer_id').val($id);
@@ -93,22 +109,26 @@ app.component('customerList', {
                         $noty.close();
                     }, 3000);
                     $('#customers_list').DataTable().ajax.reload(function(json) {});
-                    $location.path('/customer-pkg/customer/list');
+                    $location.path('/customer-pkg/customers/list');
                 }
             });
         }
 
         //FOR FILTER
         $('#customer_code').on('keyup', function() {
+            $cookies.put('customer_code', $('#customer_code').val());
             dataTables.fnFilter();
         });
         $('#customer_name').on('keyup', function() {
+            $cookies.put('customer_name', $('#customer_name').val());
             dataTables.fnFilter();
         });
         $('#mobile_no').on('keyup', function() {
+            $cookies.put('mobile_no', $('#mobile_no').val());
             dataTables.fnFilter();
         });
         $('#email').on('keyup', function() {
+            $cookies.put('email', $('#email').val());
             dataTables.fnFilter();
         });
         $scope.reset_filter = function() {
@@ -117,6 +137,10 @@ app.component('customerList', {
             $("#mobile_no").val('');
             $("#email").val('');
             dataTables.fnFilter();
+            $cookies.put('customer_code', $('#customer_code').val());
+            $cookies.put('customer_name', $('#customer_name').val());
+            $cookies.put('mobile_no', $('#mobile_no').val());
+            $cookies.put('email', $('#email').val());
         }
 
         $rootScope.loading = false;
@@ -129,6 +153,8 @@ app.component('customerForm', {
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
         get_form_data_url = typeof($routeParams.id) == 'undefined' ? customer_get_form_data_url : customer_get_form_data_url + '/' + $routeParams.id;
         var self = this;
+        $('#code').focus();
+
         self.hasPermission = HelperService.hasPermission;
         self.angular_routes = angular_routes;
         $http.get(
@@ -192,7 +218,10 @@ app.component('customerForm', {
                 self.city_list = response.data.city_list;
             });
         }
+        self.control = function(){
+            $('#address_line1').focus();
 
+        }
         var form_id = '#form';
         var v = jQuery(form_id).validate({
             ignore: '',
@@ -294,7 +323,7 @@ app.component('customerForm', {
                             setTimeout(function() {
                                 $noty.close();
                             }, 3000);
-                            $location.path('/customer-pkg/customer/list');
+                            $location.path('/customer-pkg/customers/list');
                             $scope.$apply();
                         } else {
                             if (!res.success == true) {
@@ -313,7 +342,7 @@ app.component('customerForm', {
                                 }, 3000);
                             } else {
                                 $('#submit').button('reset');
-                                $location.path('/customer-pkg/customer/list');
+                                $location.path('/customer-pkg/customers/list');
                                 $scope.$apply();
                             }
                         }

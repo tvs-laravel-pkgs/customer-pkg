@@ -4,7 +4,9 @@ namespace Abs\CustomerPkg;
 use Abs\CustomerPkg\Customer;
 use App\Address;
 use App\Country;
+use App\ActivityLog;
 use App\CustomerDetails;
+use App\CustomerDetail;
 use App\Http\Controllers\Controller;
 use Auth;
 use Carbon\Carbon;
@@ -49,7 +51,8 @@ class CustomerController extends Controller {
 					$query->where('customers.email', 'LIKE', '%' . $request->email . '%');
 				}
 			})
-			->orderby('customers.id', 'desc');
+			//->orderby('customers.id', 'desc')
+			;
 
 		return Datatables::of($customers)
 			->addColumn('code', function ($customer) {
@@ -61,11 +64,11 @@ class CustomerController extends Controller {
 				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
 				return '
 					<a href="#!/customer-pkg/customer/edit/' . $customer->id . '">
-						<img src="' . $edit_img . '" alt="View" class="img-responsive">
+						<img src="' . $edit_img . '" alt="View" class="img-responsive" title="Edit">
 					</a>
 					<a href="javascript:;" data-toggle="modal" data-target="#delete_customer"
 					onclick="angular.element(this).scope().deleteCustomer(' . $customer->id . ')" dusk = "delete-btn" title="Delete">
-					<img src="' . $delete_img . '" alt="delete" class="img-responsive">
+					<img src="' . $delete_img . '" alt="delete" class="img-responsive" title="Delete">
 					</a>
 					';
 			})
@@ -191,9 +194,20 @@ class CustomerController extends Controller {
 			$customer_details->aadhar_no = $request->aadhar_no;
 			$customer_details->customer_id = $customer->id;
 			$customer_details->save();
-
+			$activity_log = New ActivityLog;
+			$activity_log->date_time = date("Y-m-d H:i:s");
+			$activity_log->user_id = Auth::user()->id;
+			$activity_log->module = "Customer";
+			$activity_log->entity_id = $customer->id;
+			$activity_log->entity_type_id = 24;
+			$activity_log->activity_id = $activity_log->activity = $request->id ? 281: 280;
+			$activity_log->details =json_encode($activity_log);
+			$activity_log->save();
 			DB::commit();
+
 			if (!($request->id)) {
+				
+				
 				return response()->json(['success' => true, 'message' => ['Customer Details Added Successfully']]);
 			} else {
 				return response()->json(['success' => true, 'message' => ['Customer Details Updated Successfully']]);
@@ -208,6 +222,15 @@ class CustomerController extends Controller {
 		if ($delete_status) {
 			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
 			$customer_details_delete = CustomerDetail::where('customer_id', $id)->forceDelete();
+			$activity_log = New ActivityLog;
+			$activity_log->date_time = date("Y-m-d H:i:s");
+			$activity_log->user_id = Auth::user()->id;
+			$activity_log->module = "Customer";
+			$activity_log->entity_id = $id;
+			$activity_log->entity_type_id = 24;
+			$activity_log->activity_id = $activity_log->activity = 282;
+			$activity_log->details =json_encode($activity_log);
+			$activity_log->save();
 			return response()->json(['success' => true]);
 		}
 	}

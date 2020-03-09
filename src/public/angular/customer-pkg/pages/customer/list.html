@@ -6,7 +6,7 @@
                     <h1 class="title type-2">Customers</h1>
                 </div><!-- Page Header Content -->
                 <div class="page-header-content button-block">
-                    <button class="btn btn-bordered" data-toggle="modal" data-target="#customer-filter-modal"><i class="icon ion-md-funnel"></i>Filter</button>
+                    <button class="btn btn-bordered" data-toggle="modal" data-target="#customer-filter-modal"><i class="icon ion-md-funnel" ng-shortcut="'meta+shift+f'" ng-shortcut-click data-title="ctrl+shift+f" ></i>Filter</button>
                 </div><!-- Page Header Content -->
             </div><!-- Page Header Content Left -->
             <div class="page-header-content-right">
@@ -16,16 +16,23 @@
                         <li class="red">Inactive</li>
                     </ul>
                 </div><!-- Page Header Content -->
+                <div class="page-header-content reset-block">
+                    <div class="reset-wrap">
+                        <button class="btn-reset reset-tooltip">
+                            <img class="img-responsive" src="./public/theme/img/content/reset.svg" ng-click="statusChange()"alt="Reset" />
+                        </button>
+                    </div>
+                </div><!-- Page Header Content -->
                 <div class="page-header-content search-block">
                     <div class="search_filter">
                         <label>
                             <input type="search" id="search_customer" class="form-control" placeholder="Search" />
-                            <button class="btn-clear" ng-click="clear_search()">Clear</button>
+                            <button class="btn-clear" ng-click="clear_search()" ng-shortcut="'meta+shift+c'" ng-shortcut-click data-title="ctrl+shift+c">Clear</button>
                         </label>
                     </div><!-- Search Filter -->
                 </div><!-- Page Header Content -->
                 <div class="page-header-content button-block">
-                    <a href="#!/customer-pkg/customer/add" class="btn btn-primary">Add New</a>
+                    <a href="#!/customer-pkg/customer/add" class="btn btn-primary" ng-shortcut="'meta+shift+n'" ng-shortcut-click data-title="ctrl+shift+n">Add New</a>
                 </div><!-- Page Header Content -->
             </div><!-- Page Header Content Right -->
         </div><!-- Page Header Inner -->
@@ -37,13 +44,16 @@
                     <table class="table" id="customers_list" style="width: 100% !important;">
                         <thead>
                             <tr>
-                                <th class="action">Action</th>
+                                <th class="action">Actions</th>
                                 <th>Customer Code</th>
                                 <th>Customer Name</th>
                                 <th>Mobile Number</th>
                                 <th>Email</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            
+                        </tbody>
                     </table>
                 </div><!-- Column -->
             </div><!-- Row -->
@@ -86,7 +96,7 @@
                             </div><!-- Field -->
                         </div><!-- Column -->
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-rose" ng-click="reset_filter()">Reset Filter</button>
+                            <button type="button" class="btn btn-rose" ng-click="reset_filter()"  ng-shortcut="'meta+shift+t'" ng-shortcut-click data-title="ctrl+shift+t">Reset Filter</button>
                         </div>
                     </div><!-- Row -->
                 </div><!-- Modal Form -->

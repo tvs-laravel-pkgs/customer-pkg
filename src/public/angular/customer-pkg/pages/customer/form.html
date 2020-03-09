@@ -5,15 +5,16 @@
         <div class="page-header-inner">
             <div class="page-header-content-left">
                 <div class="page-header-content button-block">
-                    <a href="#!/customer-pkg/customer/list" type="button" class="btn-back btn-img">
-                        <img class="img-responsive" src="./public/theme/img/content/previous.svg" alt="Back" />
+                    <a href="#!/customer-pkg/customers/list" type="button" class="btn-back btn-img">
+                        <img class="img-responsive" src="./public/theme/img/content/previous.svg" alt="Back"  ng-shortcut="'meta+shift+left'" ng-shortcut-click data-title="ctrl+shift+left"/>
                     </a>
                 </div><!-- Page Header Content -->
                 <div class="page-header-content title-block">
                     <h1 class="title"><b>{{$ctrl.action}} Customer</b></h1>
                     <p class="subtitle">
+                        Masters / 
                         <a href="#!/customer-pkg/customer/list">
-                            Customer List
+                            Customer 
                         </a> /
                         {{$ctrl.action}}
                     </p>
@@ -38,7 +39,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a data-target="#address-details" data-toggle="tab" aria-expanded="true" class="filter">
+                                        <a data-target="#address-details" data-toggle="tab" aria-expanded="true" class="filter" ng-click="control()">
                                             Address Details
                                         </a>
                                     </li>
@@ -58,7 +59,7 @@
                                                     Customer Code
                                                     <sup class="mandatory">*</sup>
                                                 </label>
-                                                <input type="text" class="form-control required" ng-model="$ctrl.customer.code" name="code" placeholder="Enter Customer Code" />
+                                                <input type="text" class="form-control required" ng-model="$ctrl.customer.code" name="code" id="code"placeholder="Enter Customer Code" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -139,10 +140,14 @@
                                         <div class="tab-pane-footer">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <a class="btn btn-primary btn-nxt">
+                                                    <a class="btn btn-primary btn-nxt"  ng-shortcut="'meta+shift+down'" ng-shortcut-click data-title="ctrl+shift+down">
                                                         Next
                                                     </a>
+                                                    <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+shift+s'" ng-shortcut-click data-title="ctrl+shift+s">
+                                                        Submit
+                                                    </button>
                                                 </div>
+                                                
                                             </div>
                                         </div><!-- Tab Footer -->
                                     </div><!-- Row -->
@@ -157,7 +162,7 @@
                                                     Address Line 1
                                                     <sup class="mandatory">*</sup>
                                                 </label>
-                                                <input type="text" class="form-control required" ng-model="$ctrl.address.address_line1" name="address_line1" placeholder="Enter Address Line 1" />
+                                                <input type="text" id="address_line1"class="form-control required" ng-model="$ctrl.address.address_line1" name="address_line1" placeholder="Enter Address Line 1" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -245,10 +250,10 @@
                                         <div class="tab-pane-footer">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <a class="btn btn-secondary btn-prev">
+                                                    <a class="btn btn-secondary btn-prev"  ng-shortcut="'meta+shift+up'" ng-shortcut-click data-title="ctrl+shift+up">
                                                         Previous
                                                     </a>
-                                                    <button type="submit" id="submit" class="btn btn-primary">
+                                                    <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+shift+s'" ng-shortcut-click data-title="ctrl+shift+s">
                                                         Submit
                                                     </button>
                                                 </div>
