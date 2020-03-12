@@ -59,4 +59,56 @@ class Customer extends Model {
 		return $record;
 	}
 
+	public function city() {
+		return $this->belongsTo('App\City', 'city_id');
+	}
+
+	public function state() {
+		return $this->belongsTo('App\State', 'state_id');
+	}
+	public function getFormattedAddress() {
+		$customer = $this;
+		if (!$customer->address) {
+			return 'N/A';
+		}
+		$formatted_address = '';
+		$formatted_address .= !empty($customer->address) ? $customer->address : '';
+		$formatted_address .= $customer->city ? ', ' . $customer->city : '';
+		$formatted_address .= $customer->zipcode ? ', ' . $customer->zipcode : '';
+		return $formatted_address;
+
+	}
+
+	public static function searchCustomer($r) {
+		$key = $r->key;
+		$list = self::where('company_id', Auth::user()->company_id)
+			->select(
+				'id',
+				'name',
+				'code'
+			)
+			->where(function ($q) use ($key) {
+				$q->where('name', 'like', '%' . $key . '%')
+					->orWhere('code', 'like', '%' . $key . '%')
+					->orWhere('mobile_no', 'like', '%' . $key . '%')
+				;
+			})
+			->get();
+		return response()->json($list);
+	}
+
+	public static function getDetails($request) {
+		$customer = self::find($request->customer_id);
+		if (!$customer) {
+			return response()->json(['success' => false, 'error' => 'Customer not found']);
+		}
+		// $customer->formatted_address = $customer->getFormattedAddress();
+		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->getFormattedAddress() : 'NA';
+		$customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->address_line1 : '';
+		return response()->json([
+			'success' => true,
+			'customer' => $customer,
+		]);
+	}
+
 }
