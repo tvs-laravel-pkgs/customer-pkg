@@ -2,6 +2,7 @@
 
 namespace Abs\CustomerPkg;
 
+use Abs\BasicPkg\Address;
 use Abs\HelperPkg\Traits\SeederTrait;
 use App\Company;
 use App\Config;
@@ -99,17 +100,40 @@ class Customer extends Model {
 	}
 
 	public static function getDetails($request) {
-		$customer = self::find($request->customer_id);
+		if ($request->value == "fromAcc") {
+			$customer = self::where('id', $request->customer_id)->first();
+			$transfer_type = "FromAccount";
+		} else {
+			$customer = self::where('id', $request->customer_id)->first();
+			$transfer_type = "ToAccount";
+		}
+
+		//dd($customer);
 		if (!$customer) {
 			return response()->json(['success' => false, 'error' => 'Customer not found']);
 		}
 		// $customer->formatted_address = $customer->getFormattedAddress();
 		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->getFormattedAddress() : 'NA';
-		$customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->address_line1 : '';
+		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->address_line1 : '';
 		return response()->json([
 			'success' => true,
+			'transfer_type' => $transfer_type,
 			'customer' => $customer,
 		]);
+	}
+
+	public function addresses() {
+		return $this->hasMany('Abs\BasicPkg\Address', 'entity_id')->where('address_of_id', 24);
+	}
+
+	public function primaryAddress() {
+		return $this->hasOne('Abs\BasicPkg\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
+		//->first()
+		;
+	}
+
+	public function customerDetails() {
+		return $this->hasOne('App\CustomerDetails');
 	}
 
 }
