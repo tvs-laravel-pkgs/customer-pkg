@@ -6,85 +6,86 @@ app.component('customerList', {
         self.hasPermission = HelperService.hasPermission;
         var table_scroll;
         $('#search_customer').focus();
-         search_customer = $cookies.get('search_customer');
-         $('#search_customer').val(search_customer);
-         customer_code = $cookies.get('customer_code');
-         $('#customer_code').val(customer_code);
-         customer_name = $cookies.get('customer_name');
-         $('#customer_name').val(customer_name);
-         mobile_no = $cookies.get('mobile_no');
-         $('#mobile_no').val(mobile_no);
-         email = $cookies.get('email');
-         $('#email').val(email);
+        $http.get(
+                customer_session_data_url,
+            ).then(function(response) {
+                if (response.data.success) {
+                    console.log('response.data.success');
+                    console.log(response.data);
+                    self.customer_code = response.data.customer_code;
+                    self.customer_name = response.data.customer_name;
+                    self.mobile_no = response.data.mobile_no;
+                    self.email = response.data.email;
+                    $('#search_customer').val(response.data.search_customer);
+                }
+            });
          //console.log(typeof(search_customer));
         table_scroll = $('.page-main-content').height() - 37;
-        var dataTable = $('#customers_list').DataTable({
-            "dom": cndn_dom_structure,
-            "language": {
-                // "search": "",
-                // "searchPlaceholder": "Search",
-                "lengthMenu": "Rows _MENU_",
-                "paginate": {
-                    "next": '<i class="icon ion-ios-arrow-forward"></i>',
-                    "previous": '<i class="icon ion-ios-arrow-back"></i>'
+        setTimeout(function(){
+            var dataTable = $('#customers_list').DataTable({
+                "dom": cndn_dom_structure,
+                "language": {
+                    "lengthMenu": "Rows _MENU_",
+                    "paginate": {
+                        "next": '<i class="icon ion-ios-arrow-forward"></i>',
+                        "previous": '<i class="icon ion-ios-arrow-back"></i>'
+                    },
                 },
-            },
-            pageLength: 10,
-            processing: true,
-            stateSaveCallback: function(settings, data) {
-                localStorage.setItem('CDataTables_' + settings.sInstance, JSON.stringify(data));
-            },
-            stateLoadCallback: function(settings) {
-                var state_save_val = JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
-                if (state_save_val) {
-                    $('#search_customer').val(state_save_val.search.search);
+                pageLength: 10,
+                processing: true,
+                stateSaveCallback: function(settings, data) {
+                    localStorage.setItem('CDataTables_' + settings.sInstance, JSON.stringify(data));
+                },
+                stateLoadCallback: function(settings) {
+                    var state_save_val = JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
+                    if (state_save_val) {
+                        $('#search_customer').val(state_save_val.search.search);
+                    }
+                    return JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
+                },
+               serverSide: true,
+                paging: true,
+                stateSave: true,
+                ordering: true,
+                sorting:true,
+                 scrollY: table_scroll + "px",
+                scrollCollapse: true,
+                ajax: {
+                    url: laravel_routes['getCustomerList'],
+                    type: "GET",
+                    dataType: "json",
+                    data: function(d) {
+                        d.customer_code = self.customer_code;
+                        d.customer_name = self.customer_name;
+                        d.mobile_no = self.mobile_no;
+                        d.email = self.email;
+                    },
+                },
+                columns: [
+                    { data: 'action', class: 'action', "name": 'action', searchable: false },
+                    { data: 'code', "name": 'code' },
+                    { data: 'name', "name": 'name', sortable: true },
+                    { data: 'mobile_no', "name": 'mobile_no' },
+                    { data: 'email', "name": 'email' },
+                ],
+                "infoCallback": function(settings, start, end, max, total, pre) {
+                    $('#table_info').html(total)
+                    $('.foot_info').html('Showing ' + start + ' to ' + end + ' of ' + max + ' entries')
+                },
+                rowCallback: function(row, data) {
+                    $(row).addClass('highlight-row');
                 }
-                return JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
-            },
-           serverSide: true,
-            paging: true,
-            stateSave: true,
-            ordering: true,
-            sorting:true,
-             scrollY: table_scroll + "px",
-            scrollCollapse: true,
-            ajax: {
-                url: laravel_routes['getCustomerList'],
-                type: "GET",
-                dataType: "json",
-                data: function(d) {
-                    d.customer_code = $('#customer_code').val();
-                    d.customer_name = $('#customer_name').val();
-                    d.mobile_no = $('#mobile_no').val();
-                    d.email = $('#email').val();
-                },
-            },
-            columns: [
-                { data: 'action', class: 'action', "name": 'action', searchable: false },
-                { data: 'code', "name": 'code' },
-                { data: 'name', "name": 'name', sortable: true },
-                { data: 'mobile_no', "name": 'mobile_no' },
-                { data: 'email', "name": 'email' },
-            ],
-            "infoCallback": function(settings, start, end, max, total, pre) {
-                $('#table_info').html(total)
-                $('.foot_info').html('Showing ' + start + ' to ' + end + ' of ' + max + ' entries')
-            },
-            rowCallback: function(row, data) {
-                $(row).addClass('highlight-row');
-            }
-        });
-        $('.dataTables_length select').select2();
+            });
+
+            $('.dataTables_length select').select2();
 
         $scope.clear_search = function() {
             $('#search_customer').val('');
-            $cookies.put('search_customer', $('#search_customer').val());
             $('#customers_list').DataTable().search('').draw();
         }
 
         var dataTables = $('#customers_list').dataTable();
         $("#search_customer").keyup(function() {
-            $cookies.put('search_customer', $('#search_customer').val());
             dataTables.fnFilter(this.value);
         });
         $scope.statusChange=function(){
@@ -116,34 +117,28 @@ app.component('customerList', {
 
         //FOR FILTER
         $('#customer_code').on('keyup', function() {
-            $cookies.put('customer_code', $('#customer_code').val());
             dataTables.fnFilter();
         });
         $('#customer_name').on('keyup', function() {
-            $cookies.put('customer_name', $('#customer_name').val());
             dataTables.fnFilter();
         });
         $('#mobile_no').on('keyup', function() {
-            $cookies.put('mobile_no', $('#mobile_no').val());
             dataTables.fnFilter();
         });
         $('#email').on('keyup', function() {
-            $cookies.put('email', $('#email').val());
             dataTables.fnFilter();
         });
         $scope.reset_filter = function() {
-            $("#customer_name").val('');
-            $("#customer_code").val('');
-            $("#mobile_no").val('');
-            $("#email").val('');
+            self.customer_code = '';
+            self.customer_name = "";
+            self.mobile_no = "";
+            self.email = "";
             dataTables.fnFilter();
-            $cookies.put('customer_code', $('#customer_code').val());
-            $cookies.put('customer_name', $('#customer_name').val());
-            $cookies.put('mobile_no', $('#mobile_no').val());
-            $cookies.put('email', $('#email').val());
         }
 
         $rootScope.loading = false;
+        },2000);
+        
     }
 });
 //------------------------------------------------------------------------------------------------------------------------
@@ -305,7 +300,7 @@ app.component('customerForm', {
             },
             submitHandler: function(form) {
                 let formData = new FormData($(form_id)[0]);
-                $('#submit').button('loading');
+                $('.submit').button('loading');
                 $.ajax({
                         url: laravel_routes['saveCustomer'],
                         method: "POST",
@@ -327,7 +322,7 @@ app.component('customerForm', {
                             $scope.$apply();
                         } else {
                             if (!res.success == true) {
-                                $('#submit').button('reset');
+                                $('.submit').button('reset');
                                 var errors = '';
                                 for (var i in res.errors) {
                                     errors += '<li>' + res.errors[i] + '</li>';
@@ -341,14 +336,14 @@ app.component('customerForm', {
                                     $noty.close();
                                 }, 3000);
                             } else {
-                                $('#submit').button('reset');
+                                $('.submit').button('reset');
                                 $location.path('/customer-pkg/customers/list');
                                 $scope.$apply();
                             }
                         }
                     })
                     .fail(function(xhr) {
-                        $('#submit').button('reset');
+                        $('.submit').button('reset');
                         $noty = new Noty({
                             type: 'error',
                             layout: 'topRight',

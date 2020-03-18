@@ -6,7 +6,6 @@
 
 <script type="text/javascript">
 	app.config(['$routeProvider', function($routeProvider) {
-
 	    $routeProvider.
 	    when('/customer-pkg/customers/list', {
 	        template: '<customer-list></customer-list>',
@@ -26,5 +25,6 @@
     var customer_get_form_data_url = "{{url('customer-pkg/customer/get-form-data/')}}";
     var customer_form_template_url = "{{URL::asset($customer_pkg_prefix.'/public/angular/customer-pkg/pages/customer/form.html')}}";
     var customer_delete_data_url = "{{url('customer-pkg/customer/delete/')}}";
+    var customer_session_data_url = "{{url('customer-pkg/customer/session-data')}}";
 </script>
 <script type="text/javascript" src="{{URL::asset($customer_pkg_prefix.'/public/angular/customer-pkg/pages/customer/controller.js?v=2')}}"></script>

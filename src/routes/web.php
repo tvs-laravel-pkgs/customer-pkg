@@ -7,5 +7,6 @@ Route::group(['namespace' => 'Abs\CustomerPkg', 'middleware' => ['web', 'auth'],
 	Route::get('/customer/get-form-data/{id?}', 'CustomerController@getCustomerFormData')->name('getCustomerFormData');
 	Route::post('/customer/save', 'CustomerController@saveCustomer')->name('saveCustomer');
 	Route::get('/customer/delete/{id}', 'CustomerController@deleteCustomer')->name('deleteCustomer');
+	Route::get('/customer/session-data', 'CustomerController@getCustonerSessionData')->name('getCustonerSessionData');
 
 });

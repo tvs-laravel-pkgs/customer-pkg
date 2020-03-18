@@ -14,13 +14,29 @@ use DB;
 use Illuminate\Http\Request;
 use Validator;
 use Yajra\Datatables\Datatables;
+use Session;
 
 class CustomerController extends Controller {
 
 	public function __construct() {
 	}
-
+	public function getCustonerSessionData(){
+		$this->data['search_customer'] = Session::get('search_customer');
+		$this->data['customer_code'] = Session::get('customer_code');
+		$this->data['customer_name'] = Session::get('customer_name');
+		$this->data['mobile_no'] = Session::get('mobile_no');
+		$this->data['email'] = Session::get('email');
+		$this->data['success'] = true;
+		return response()->json($this->data);
+	}
 	public function getCustomerList(Request $request) {
+		Session::put('search_customer',$request->search_customer);
+		Session::put('customer_code',$request->customer_code);
+		Session::put('customer_name',$request->customer_name);
+		Session::put('mobile_no',$request->mobile_no);
+		Session::put('email',$request->email);
+		Session::save();
+
 		$customers = Customer::withTrashed()
 			->select(
 				'customers.id',
@@ -33,22 +49,22 @@ class CustomerController extends Controller {
 			->where('customers.company_id', Auth::user()->company_id)
 			->where(function ($query) use ($request) {
 				if (!empty($request->customer_code)) {
-					$query->where('customers.code', 'LIKE', '%' . $request->customer_code . '%');
+					$query->where('customers.code', 'LIKE',$request->customer_code);
 				}
 			})
 			->where(function ($query) use ($request) {
 				if (!empty($request->customer_name)) {
-					$query->where('customers.name', 'LIKE', '%' . $request->customer_name . '%');
+					$query->where('customers.name', 'LIKE',$request->customer_name);
 				}
 			})
 			->where(function ($query) use ($request) {
 				if (!empty($request->mobile_no)) {
-					$query->where('customers.mobile_no', 'LIKE', '%' . $request->mobile_no . '%');
+					$query->where('customers.mobile_no', 'LIKE', $request->mobile_no);
 				}
 			})
 			->where(function ($query) use ($request) {
 				if (!empty($request->email)) {
-					$query->where('customers.email', 'LIKE', '%' . $request->email . '%');
+					$query->where('customers.email', 'LIKE',$request->email);
 				}
 			})
 			//->orderby('customers.id', 'desc')
@@ -221,7 +237,7 @@ class CustomerController extends Controller {
 		$delete_status = Customer::withTrashed()->where('id', $id)->forceDelete();
 		if ($delete_status) {
 			$address_delete = Address::where('address_of_id', 24)->where('entity_id', $id)->forceDelete();
-			$customer_details_delete = CustomerDetail::where('customer_id', $id)->forceDelete();
+			$customer_details_delete = CustomerDetails::where('customer_id', $id)->forceDelete();
 			$activity_log = New ActivityLog;
 			$activity_log->date_time = date("Y-m-d H:i:s");
 			$activity_log->user_id = Auth::user()->id;
