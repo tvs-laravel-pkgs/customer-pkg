@@ -90,34 +90,41 @@ class Customer extends Model {
 				'code'
 			)
 			->where(function ($q) use ($key) {
-				$q->where('name', 'like', '%' . $key . '%')
-					->orWhere('code', 'like', '%' . $key . '%')
-					->orWhere('mobile_no', 'like', '%' . $key . '%')
+				//ISSUE : full pattern search should be avoided
+				$q->where('name', 'like', $key . '%')
+					->orWhere('code', 'like', $key . '%')
+					->orWhere('mobile_no', 'like', $key . '%')
 				;
+				// $q->where('name', 'like', '%' . $key . '%')
+				// 	->orWhere('code', 'like', '%' . $key . '%')
+				// 	->orWhere('mobile_no', 'like', '%' . $key . '%')
+				// ;
+
 			})
 			->get();
 		return response()->json($list);
 	}
 
-	public static function getDetails($request) {
-		if ($request->value == "fromAcc") {
-			$customer = self::where('id', $request->customer_id)->first();
-			$transfer_type = "FromAccount";
-		} else {
-			$customer = self::where('id', $request->customer_id)->first();
-			$transfer_type = "ToAccount";
-		}
+	public static function getCustomer($request) {
+		$customer = self::find($request->id);
 
-		//dd($customer);
+		//ISSUE : CRAZY
+		// if ($request->value == "fromAcc") {
+		// 	$customer = self::where('id', $request->customer_id)->first();
+		// 	$transfer_type = "FromAccount";
+		// } else {
+		// 	$customer = self::where('id', $request->customer_id)->first();
+		// 	$transfer_type = "ToAccount";
+		// }
+
 		if (!$customer) {
 			return response()->json(['success' => false, 'error' => 'Customer not found']);
 		}
-		// $customer->formatted_address = $customer->getFormattedAddress();
-		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->getFormattedAddress() : 'NA';
-		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->address_line1 : '';
+		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->formatted_address : 'NA';
 		return response()->json([
 			'success' => true,
-			'transfer_type' => $transfer_type,
+			// ISSUE : CRAZY
+			// 'transfer_type' => $transfer_type,
 			'customer' => $customer,
 		]);
 	}

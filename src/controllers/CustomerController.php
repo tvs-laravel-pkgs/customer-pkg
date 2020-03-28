@@ -211,4 +211,13 @@ class CustomerController extends Controller {
 			return response()->json(['success' => true]);
 		}
 	}
+
+	public function searchCustomer(Request $r) {
+		return Customer::searchCustomer($r);
+	}
+
+	public function getCustomer(Request $request) {
+		return Customer::getCustomer($request);
+	}
+
 }
