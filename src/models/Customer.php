@@ -65,6 +65,10 @@ class Customer extends Model {
 		return $this->belongsTo('App\City', 'city_id');
 	}
 
+	public function invoices() {
+		return $this->hasMany('Abs\InvoicePkg\Invoice', 'customer_id'); //->where('entity_type_id',);
+	}
+
 	public function state() {
 		return $this->belongsTo('App\State', 'state_id');
 	}
