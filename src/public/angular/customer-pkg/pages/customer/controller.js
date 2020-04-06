@@ -4,6 +4,8 @@ app.component('customerList', {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
+        $('li').removeClass('active');
+        $('.master_link').addClass('active').trigger('click');
         var table_scroll;
         table_scroll = $('.page-main-content').height() - 37;
         var dataTable = $('#customers_list').DataTable({
