@@ -5,7 +5,6 @@ namespace Abs\CustomerPkg;
 use Abs\BasicPkg\Address;
 use Abs\HelperPkg\Traits\SeederTrait;
 use App\Company;
-use App\Config;
 use Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,9 +40,9 @@ class Customer extends Model {
 			return;
 		}
 
-		$type = Config::where('name', $record_data->type)->where('config_type_id', 89)->first();
-		if (!$type) {
-			$errors[] = 'Invalid Tax Type : ' . $record_data->type;
+		$outlet = Outlet::where('code', $record_data->outlet)->where('company_id', $company->id)->first();
+		if (!$outlet) {
+			$errors[] = 'Invalid outlet : ' . $record_data->outlet;
 		}
 
 		if (count($errors) > 0) {
@@ -53,10 +52,18 @@ class Customer extends Model {
 
 		$record = self::firstOrNew([
 			'company_id' => $company->id,
-			'name' => $record_data->tax_name,
+			'code' => $record_data->customer_code,
 		]);
-		$record->type_id = $type->id;
-		$record->created_by_id = $admin->id;
+		$record->name = $record_data->name;
+		$record->mobile_no = $record_data->mobile_number;
+		$record->email = $record_data->email;
+		$record->address = $record_data->address;
+		$record->city = $record_data->city;
+		$record->zipcode = $record_data->zipcode;
+		$record->business_id = $record_data->business;
+		$record->cust_group = $record_data->customer_group;
+		$record->dimension = $record_data->dimension;
+		$record->outlet_id = $outlet->id;
 		$record->save();
 		return $record;
 	}
@@ -94,16 +101,10 @@ class Customer extends Model {
 				'code'
 			)
 			->where(function ($q) use ($key) {
-				//ISSUE : full pattern search should be avoided
 				$q->where('name', 'like', $key . '%')
 					->orWhere('code', 'like', $key . '%')
 					->orWhere('mobile_no', 'like', $key . '%')
 				;
-				// $q->where('name', 'like', '%' . $key . '%')
-				// 	->orWhere('code', 'like', '%' . $key . '%')
-				// 	->orWhere('mobile_no', 'like', '%' . $key . '%')
-				// ;
-
 			})
 			->get();
 		return response()->json($list);
@@ -112,39 +113,54 @@ class Customer extends Model {
 	public static function getCustomer($request) {
 		$customer = self::find($request->id);
 
-		//ISSUE : CRAZY
-		// if ($request->value == "fromAcc") {
-		// 	$customer = self::where('id', $request->customer_id)->first();
-		// 	$transfer_type = "FromAccount";
-		// } else {
-		// 	$customer = self::where('id', $request->customer_id)->first();
-		// 	$transfer_type = "ToAccount";
-		// }
-
 		if (!$customer) {
 			return response()->json(['success' => false, 'error' => 'Customer not found']);
 		}
-		// $customer->formatted_address = $customer->primaryAddress ? $customer->primaryAddress->formatted_address : 'NA';
 		return response()->json([
 			'success' => true,
-			// ISSUE : CRAZY
-			// 'transfer_type' => $transfer_type,
 			'customer' => $customer,
 		]);
 	}
 
 	public function addresses() {
-		return $this->hasMany('Abs\BasicPkg\Address', 'entity_id')->where('address_of_id', 24);
+		return $this->hasMany('App\Address', 'entity_id')->where('address_of_id', 24);
 	}
 
 	public function primaryAddress() {
-		return $this->hasOne('Abs\BasicPkg\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
+		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
 		//->first()
 		;
 	}
 
-	public function customerDetails() {
-		return $this->hasOne('App\CustomerDetails');
+	public function customerDetail() {
+		return $this->hasOne('App\CustomerDetail');
+	}
+
+	public function saveCustomer($values) {
+		if (!$request['id']) {
+			//NEW CUSTOMER
+			$customer = new Self;
+			$customer->company_id = Auth::user()->company_id;
+			$customer->created_by_id = Auth::id();
+		} else {
+			$customer = Customer::find($request->id);
+			$customer->updated_by_id = Auth::id();
+		}
+		$customer->fill($values);
+		$customer->save();
+		return $customer;
+
+	}
+	public function saveAddress($values) {
+		$address = Address::firstOrNew([
+			'company_id' => $this->company_id,
+			'address_of_id' => 24, //CUSTOMER
+			'entity_id' => $this->id,
+			'address_type_id' => 40, //PRIMARY ADDRESS
+		]);
+		$address->fill($values);
+		$address->save();
+		return $address;
 	}
 
 }
