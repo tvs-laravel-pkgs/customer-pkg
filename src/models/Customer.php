@@ -2,8 +2,8 @@
 
 namespace Abs\CustomerPkg;
 
-use Abs\BasicPkg\Address;
 use Abs\HelperPkg\Traits\SeederTrait;
+use App\Address;
 use App\Company;
 use Auth;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +23,8 @@ class Customer extends Model {
 		'email',
 		'company_id',
 		'address',
+		'gst_number',
+		'pan_number',
 	];
 
 	public static function createFromObject($record_data) {
@@ -128,7 +130,11 @@ class Customer extends Model {
 
 	public function primaryAddress() {
 		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
-		//->first()
+		;
+	}
+
+	public function address() {
+		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
 		;
 	}
 
@@ -136,18 +142,24 @@ class Customer extends Model {
 		return $this->hasOne('App\CustomerDetail');
 	}
 
-	public function saveCustomer($values) {
-		if (!$request['id']) {
+	public static function saveCustomer($values) {
+		if (!$values['id']) {
 			//NEW CUSTOMER
 			$customer = new Self;
 			$customer->company_id = Auth::user()->company_id;
 			$customer->created_by_id = Auth::id();
 		} else {
-			$customer = Customer::find($request->id);
+			$customer = Customer::find($values['id']);
 			$customer->updated_by_id = Auth::id();
 		}
 		$customer->fill($values);
+		if (!isset($values['code']) || !$values['code']) {
+			$customer->code = rand();
+		}
 		$customer->save();
+		if (!isset($values['code']) || !$values['code']) {
+			$customer->code = $customer->id;
+		}
 		return $customer;
 
 	}
