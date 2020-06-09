@@ -171,6 +171,7 @@ class CustomerController extends Controller {
 			}
 			$customer->gst_number = $request->gst_number;
 			$customer->axapta_location_id = $request->axapta_location_id;
+			$customer->cash_limit_status = $request->cash_limit_status;
 			$customer->save();
 
 			if (!$address) {

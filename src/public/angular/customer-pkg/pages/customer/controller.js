@@ -151,10 +151,12 @@ app.component('customerForm', {
                 } else {
                     self.switch_value = 'Active';
                 }
+                self.customer.cash_limit_status = self.customer.cash_limit_status ? self.customer.cash_limit_status : 0;
             } else {
                 self.switch_value = 'Active';
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
                 self.city_list = [{ 'id': '', 'name': 'Select City' }];
+                self.customer.cash_limit_status = 0;
             }
         });
 

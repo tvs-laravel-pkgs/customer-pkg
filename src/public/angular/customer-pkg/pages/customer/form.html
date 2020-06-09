@@ -109,17 +109,29 @@
                                             </div><!-- Field -->
                                         </div><!-- Column -->
                                         <!--Add Aadhar and PAN no to customer by Karthik kumar on 19-02-2020 -->
-                                         <div class="col-md-3">
+                                        <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>Aadhar Number</label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.customer_details.aadhar_no" name="aadhar_no" placeholder="Enter Aadhar Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
-                                         <div class="col-md-3">
+                                        <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>PAN Number</label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.customer_details.pan_no" name="pan_no" placeholder="Enter PAN Number" />
                                             </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Cash Limit<sup class="mandatory">*</sup></label>
+                                                <div class="radio">
+                                                    <input type="radio" id="allowed" class="config_name" name="cash_limit_status" value="1" ng-checked="$ctrl.customer.cash_limit_status == 1" ng-model="$ctrl.customer.cash_limit_status"><label class="radio-label" for="allowed">Allowed</label>
+                                                </div><!-- Radio -->
+                                                <div class="radio">
+                                                    <input type="radio" id="not_allowed" class="config_name" name="cash_limit_status" value="0" ng-checked="$ctrl.customer.cash_limit_status == 0" ng-model="$ctrl.customer.cash_limit_status">
+                                                    <label class="radio-label" for="not_allowed">Not Allowed</label>
+                                                </div><!-- Radio -->
+                                            </div><!-- Field -->
                                         </div><!-- Column -->
                                         <!-- END -->
                                         <div class="col-md-3">
