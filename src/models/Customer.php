@@ -145,11 +145,11 @@ class Customer extends Model {
 	public static function saveCustomer($values) {
 		if (!$values['id']) {
 			//NEW CUSTOMER
-			$customer = new self;
+			$customer = new Customer;
 			$customer->company_id = Auth::user()->company_id;
 			$customer->created_by_id = Auth::id();
 		} else {
-			$customer = self::find($values['id']);
+			$customer = Customer::find($values['id']);
 			$customer->updated_by_id = Auth::id();
 		}
 		$customer->fill($values);
