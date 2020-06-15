@@ -157,9 +157,9 @@ class Customer extends Model {
 			$customer->code = rand();
 		}
 		$customer->save();
-		if (!isset($values['code']) || !$values['code']) {
-			$customer->code = $customer->id;
-		}
+		// if (!isset($values['code']) || !$values['code']) {
+		// 	$customer->code = $customer->id;
+		// }
 		return $customer;
 
 	}
