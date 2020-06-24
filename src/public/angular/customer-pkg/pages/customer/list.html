@@ -86,7 +86,43 @@
                             </div><!-- Field -->
                         </div><!-- Column -->
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-rose" ng-click="reset_filter()">Reset Filter</button>
+                            <div class="input-text form-group">
+                                <label>
+                                    State
+                                    <sup class="mandatory">*</sup>
+                                </label>
+                                <md-select ng-model="$ctrl.state.id" placeholder="Select State" data-md-container-class="selectdemoSelectHeader" ng-change="onSelectedState($ctrl.state.id);$ctrl.city.id=''" md-on-close="clearSearchTerm()">
+                                    <md-select-header class="demo-select-header">
+                                        <input ng-model="searchState" type="search" placeholder="Search for a State" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                    </md-select-header>
+                                    <md-optgroup label="state">
+                                        <md-option ng-value="state.id" ng-repeat="state in extras.state_list | filter:searchState">{{state.name}}</md-option>
+                                    </md-optgroup>
+                                </md-select>
+                                <input type="hidden" name="state_id" id="state_id" value='' class="required">
+                            </div><!-- Feild -->
+                        </div><!-- Column -->
+                        <div class="col-md-6">
+                            <div class="input-text form-group">
+                                <label>
+                                    City
+                                    <sup class="mandatory">*</sup>
+                                </label>
+                                <md-select ng-model="$ctrl.city.id" placeholder="Select City" data-md-container-class="selectdemoSelectHeader" md-on-close="clearSearchTerm1()" ng-change="onSelectedCity($ctrl.city.id)">
+                                    <md-select-header class="demo-select-header">
+                                        <input ng-model="searchCity" type="search" placeholder="Search for a City" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                    </md-select-header>
+                                    <md-optgroup label="">
+                                        <md-option ng-value="city.id" ng-repeat="city in $ctrl.city_list | filter:searchCity">
+                                            {{city.name}}
+                                        </md-option>
+                                    </md-optgroup>
+                                </md-select>
+                                <input type="hidden" name="city_id" id="city_id" value='' class="required">
+                            </div><!-- Feild -->
+                        </div><!-- Column -->
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-rose" ng-click="reset_filter();$ctrl.state.id='';$ctrl.city.id=''">Reset Filter</button>
                         </div>
                     </div><!-- Row -->
                 </div><!-- Modal Form -->

@@ -6,6 +6,7 @@ use App\Address;
 use App\Country;
 use App\CustomerDetails;
 use App\Http\Controllers\Controller;
+use App\State;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -18,7 +19,16 @@ class CustomerController extends Controller {
 	public function __construct() {
 	}
 
+	public function getCustomerFilterData(Request $request) {
+		$this->data['extras'] = [
+			'state_list' => collect(State::select('id', 'name', 'code')->where('country_id', 1)->get())->prepend(['id' => '', 'name' => 'Select State']),
+		];
+		return response()->json($this->data);
+	}
+
 	public function getCustomerList(Request $request) {
+		// dd($request->all());
+		// $include_address_filter =
 		$customers = Customer::withTrashed()
 			->select(
 				'customers.id',
@@ -50,6 +60,22 @@ class CustomerController extends Controller {
 				}
 			})
 			->orderby('customers.id', 'desc');
+
+		if (!empty($request->state_id) || !empty($request->city_id)) {
+			$customers = $customers->join('addresses', 'addresses.entity_id', 'customers.id')
+				->where('addresses.address_of_id', 24) //CUSTOMER
+				->where(function ($query) use ($request) {
+					if (!empty($request->state_id)) {
+						$query->where('addresses.state_id', $request->state_id);
+					}
+				})
+				->where(function ($query) use ($request) {
+					if (!empty($request->city_id)) {
+						$query->where('addresses.city_id', $request->city_id);
+					}
+				})
+			;
+		}
 
 		return Datatables::of($customers)
 			->addColumn('code', function ($customer) {

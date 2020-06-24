@@ -1,6 +1,6 @@
 app.component('customerList', {
     templateUrl: customer_list_template_url,
-    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
+    controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location, $mdSelect, $element) {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
@@ -46,6 +46,8 @@ app.component('customerList', {
                     d.customer_name = $('#customer_name').val();
                     d.mobile_no = $('#mobile_no').val();
                     d.email = $('#email').val();
+                    d.state_id = $('#state_id').val();
+                    d.city_id = $('#city_id').val();
                 },
             },
 
@@ -101,6 +103,25 @@ app.component('customerList', {
         }
 
         //FOR FILTER
+        $http.get(
+            laravel_routes['getCustomerFilterData']
+        ).then(function(response) {
+            console.log(response.data);
+            $scope.extras = response.data.extras;
+        });
+
+        $('.modal').bind('click', function(event) {
+            if ($('.md-select-menu-container').hasClass('md-active')) {
+                $mdSelect.hide();
+            }
+        });
+        $scope.clearSearchTerm = function() {
+            $scope.searchTerm = '';
+            $scope.searchTerm1 = '';
+        };
+        $element.find('input').on('keydown', function(ev) {
+            ev.stopPropagation();
+        });
         $('#customer_code').on('keyup', function() {
             dataTables.fnFilter();
         });
@@ -113,11 +134,28 @@ app.component('customerList', {
         $('#email').on('keyup', function() {
             dataTables.fnFilter();
         });
+        $scope.onSelectedState = function(id){
+            $('#state_id').val(id);
+            customer_get_city_by_state = vendor_get_city_by_state
+            $http.post(
+                customer_get_city_by_state, { 'state_id': id }
+            ).then(function(response) {
+                console.log(response);
+                self.city_list = response.data.city_list;
+            });
+            dataTables.fnFilter();
+        }
+        $scope.onSelectedCity = function(id){
+            $('#city_id').val(id);
+            dataTables.fnFilter();
+        }
         $scope.reset_filter = function() {
             $("#customer_name").val('');
             $("#customer_code").val('');
             $("#mobile_no").val('');
             $("#email").val('');
+            $("#state_id").val('');
+            $("#city_id").val('');
             dataTables.fnFilter();
         }
 

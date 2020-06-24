@@ -9,5 +9,6 @@ Route::group(['namespace' => 'Abs\CustomerPkg', 'middleware' => ['web', 'auth'],
 	Route::get('/customer/delete/{id}', 'CustomerController@deleteCustomer')->name('deleteCustomer');
 	Route::post('/customer/search', 'CustomerController@searchCustomer')->name('searchCustomer');
 	Route::post('/customer/get', 'CustomerController@getCustomer')->name('getCustomer');
+	Route::get('/customer/get-filter-data', 'CustomerController@getCustomerFilterData')->name('getCustomerFilterData');
 
 });
