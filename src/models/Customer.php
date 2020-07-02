@@ -6,13 +6,16 @@ use Abs\HelperPkg\Traits\SeederTrait;
 use App\Address;
 use App\BaseModel;
 use App\Company;
+use App\Outlet;
 use Auth;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends BaseModel {
 	use SeederTrait;
 	use SoftDeletes;
 	protected $table = 'customers';
+	public static $AUTO_GENERATE_CODE = false;
 	public $timestamps = true;
 	protected $fillable = [
 		'code',
@@ -26,6 +29,170 @@ class Customer extends BaseModel {
 		'gst_number',
 		'pan_number',
 	];
+
+	protected static $excelColumnRules = [
+		'Name' => [
+			'table_column_name' => 'name',
+			'rules' => [
+				'required' => [
+				],
+			],
+		],
+		'Code' => [
+			'table_column_name' => 'code',
+			'rules' => [
+				'required' => [
+				],
+			],
+		],
+		'Mobile Number' => [
+			'table_column_name' => 'mobile_no',
+			'rules' => [
+				// 'mobile_number' => [],
+			],
+		],
+		'Email' => [
+			'table_column_name' => 'email',
+			'rules' => [
+
+			],
+		],
+		'GST Number' => [
+			'table_column_name' => 'gst_number',
+			'rules' => [
+
+			],
+		],
+		'Business Code' => [
+			'table_column_name' => 'business_id',
+			'rules' => [
+
+			],
+		],
+		'Outlet Code' => [
+			'table_column_name' => 'outlet_id',
+			'rules' => [
+				'fk' => [
+					'class' => 'App\Outlet',
+					'foreign_table_column' => 'code',
+					'check_with_company' => true,
+				],
+			],
+		],
+		'Customer Group Name' => [
+			'table_column_name' => 'cust_group',
+			'rules' => [
+
+			],
+		],
+		'Dimension' => [
+			'table_column_name' => 'dimension',
+			'rules' => [
+
+			],
+		],
+		'Pan Number' => [
+			'table_column_name' => 'pan_number',
+			'rules' => [
+
+			],
+		],
+	];
+
+	public static function saveFromObject($record_data) {
+		$record = [
+			'Company Code' => $record_data->company_code,
+			'Code' => $record_data->code,
+			'Name' => $record_data->name,
+			'Mobile Number' => $record_data->mobile_number,
+			'Email' => $record_data->email,
+			'GST Number' => $record_data->gst_number,
+			'Business Code' => $record_data->business_code,
+			'Outlet Code' => $record_data->outlet_code,
+			'Customer Group Name' => $record_data->customer_group_name,
+			'Dimension' => $record_data->dimension,
+			'Pan Number' => $record_data->pan_number,
+		];
+		return static::saveFromExcelArray($record);
+	}
+
+	public static function saveFromExcelArray($record_data) {
+		$errors = [];
+		$company = Company::where('code', $record_data['Company Code'])->first();
+		if (!$company) {
+			return [
+				'success' => false,
+				'errors' => ['Invalid Company : ' . $record_data['Company Code']],
+			];
+		}
+
+		if (!isset($record_data['created_by_id'])) {
+			$admin = $company->admin();
+
+			if (!$admin) {
+				return [
+					'success' => false,
+					'errors' => ['Default Admin user not found'],
+				];
+			}
+			$created_by_id = $admin->id;
+		} else {
+			$created_by_id = $record_data['created_by_id'];
+		}
+
+		$outlet_id = null;
+		if (!empty($record_data['Outlet Code'])) {
+
+			$outlet = Outlet::where([
+				'company_id' => $company->id,
+				'code' => $record_data['Outlet Code'],
+			])->first();
+			if (!$outlet) {
+				$errors[] = 'Invalid Outlet Code : ' . $record_data['Outlet Code'];
+			} else {
+				$outlet_id = $outlet->id;
+			}
+		}
+
+		$business_id = null;
+		if (!empty($record_data['Business Code'])) {
+
+			$business = Outlet::where([
+				'company_id' => $company->id,
+				'code' => $record_data['Business Code'],
+			])->first();
+			if (!$business) {
+				$errors[] = 'Invalid Business Code : ' . $record_data['Business Code'];
+			} else {
+				$business_id = $business->id;
+			}
+		}
+
+		if (count($errors) > 0) {
+			return [
+				'success' => false,
+				'errors' => $errors,
+			];
+		}
+		$record = self::firstOrNew([
+			'company_id' => $company->id,
+			'code' => $record_data['Code'],
+		]);
+
+		$result = Self::validateAndFillExcelColumns($record_data, Static::$excelColumnRules, $record);
+		if (!$result['success']) {
+			return $result;
+		}
+		$record->business_id = $business_id;
+		$record->outlet_id = $outlet_id;
+		$record->cust_group = null;
+		$record->company_id = $company->id;
+		$record->created_by_id = $created_by_id;
+		$record->save();
+		return [
+			'success' => true,
+		];
+	}
 
 	protected $appends = [
 		// 'formatted_address',
@@ -117,7 +284,7 @@ class Customer extends BaseModel {
 		}
 	}
 
-	public static function createFromObject($record_data) {
+	/*public static function createFromObject($record_data) {
 
 		$errors = [];
 		$company = Company::where('code', $record_data->company)->first();
@@ -158,7 +325,7 @@ class Customer extends BaseModel {
 		$record->outlet_id = $outlet->id;
 		$record->save();
 		return $record;
-	}
+	}*/
 
 	public function getFormattedAddress() {
 		$customer = $this;
