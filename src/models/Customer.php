@@ -4,12 +4,12 @@ namespace Abs\CustomerPkg;
 
 use Abs\HelperPkg\Traits\SeederTrait;
 use App\Address;
+use App\BaseModel;
 use App\Company;
 use Auth;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Customer extends Model {
+class Customer extends BaseModel {
 	use SeederTrait;
 	use SoftDeletes;
 	protected $table = 'customers';
@@ -26,6 +26,96 @@ class Customer extends Model {
 		'gst_number',
 		'pan_number',
 	];
+
+	protected $appends = [
+		// 'formatted_address',
+	];
+
+	// protected $visible = [
+	// 	'id',
+	// 	'first_name',
+	// 	'last_name',
+	// 	'display_name',
+	// 	'email',
+	// 	'contact_email',
+	// 	'token',
+	// 	'address',
+	// 	'dob',
+	// 	'phone',
+	// 	'data_captured',
+	// 	'activated',
+	// ];
+
+	// Query Scopes --------------------------------------------------------------
+
+	public function scopeFilterSearch($query, $term) {
+		if (strlen($term)) {
+			$query->where(function ($query) use ($term) {
+				$query->where('name', 'like', $term . '%')
+					->orWhere('code', 'like', $term . '%');
+			});
+		}
+	}
+
+	// Getter & Setters --------------------------------------------------------------
+
+	public function getFormattedAddressAttribute() {
+		$customer = $this;
+		if (!$customer->address) {
+			return 'N/A';
+		}
+		$formatted_address = '';
+		$formatted_address .= !empty($customer->address) ? $customer->address : '';
+		$formatted_address .= $customer->city ? ', ' . $customer->city : '';
+		$formatted_address .= $customer->zipcode ? ', ' . $customer->zipcode : '';
+		return $formatted_address;
+
+	}
+
+	// Relations --------------------------------------------------------------
+
+	public function addresses() {
+		return $this->hasMany('App\Address', 'entity_id')->where('address_of_id', static::$ADDRESS_OF_ID);
+	}
+
+	public function primaryAddress() {
+		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', static::$ADDRESS_OF_ID)->where('address_type_id', static::$PRIMARY_ADDRESS_TYPE_ID)
+		;
+	}
+
+	public function address() {
+		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', static::$ADDRESS_OF_ID)->where('address_type_id', static::$PRIMARY_ADDRESS_TYPE_ID)
+		;
+	}
+
+	public static function relationships($action = '') {
+		if ($action == 'options') {
+			$relationships = [
+			];
+		} else if ($action == 'index') {
+			$relationships = [
+			];
+		} else {
+			$relationships = [
+				'primaryAddress',
+				'primaryAddress.city',
+				'primaryAddress.state',
+				'primaryAddress.country',
+			];
+		}
+
+		return $relationships;
+	}
+
+	public static function selectableFields($type = '') {
+		if ($type == 'options') {
+			return [
+				'id',
+				'code',
+				'name',
+			];
+		}
+	}
 
 	public static function createFromObject($record_data) {
 
@@ -70,17 +160,6 @@ class Customer extends Model {
 		return $record;
 	}
 
-	public function city() {
-		return $this->belongsTo('App\City', 'city_id');
-	}
-
-	public function invoices() {
-		return $this->hasMany('Abs\InvoicePkg\Invoice', 'customer_id'); //->where('entity_type_id',);
-	}
-
-	public function state() {
-		return $this->belongsTo('App\State', 'state_id');
-	}
 	public function getFormattedAddress() {
 		$customer = $this;
 		if (!$customer->address) {
@@ -122,24 +201,6 @@ class Customer extends Model {
 			'success' => true,
 			'customer' => $customer,
 		]);
-	}
-
-	public function addresses() {
-		return $this->hasMany('App\Address', 'entity_id')->where('address_of_id', 24);
-	}
-
-	public function primaryAddress() {
-		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
-		;
-	}
-
-	public function address() {
-		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', 24)->where('address_type_id', 40)
-		;
-	}
-
-	public function customerDetail() {
-		return $this->hasOne('App\CustomerDetail');
 	}
 
 	public static function saveCustomer($values) {
