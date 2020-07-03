@@ -342,11 +342,12 @@ class Customer extends BaseModel {
 
 	public static function searchCustomer($r) {
 		$key = $r->key;
-		$list = self::where('company_id', Auth::user()->company_id)
+		$list = self::with(['primaryAddress'])->where('company_id', Auth::user()->company_id)
 			->select(
 				'id',
 				'name',
-				'code'
+				'code',
+				'gst_number'
 			)
 			->where(function ($q) use ($key) {
 				$q->where('name', 'like', $key . '%')
