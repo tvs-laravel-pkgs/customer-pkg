@@ -404,4 +404,8 @@ class Customer extends BaseModel {
 		return $address;
 	}
 
+	public function invoices() {
+		return $this->hasMany('Abs\InvoicePkg\Invoice', 'customer_id'); //->where('entity_type_id',);
+	}
+
 }
