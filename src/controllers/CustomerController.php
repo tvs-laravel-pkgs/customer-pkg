@@ -176,12 +176,16 @@ class CustomerController extends Controller {
 				$customer->created_by_id = Auth::user()->id;
 				$customer->created_at = Carbon::now();
 				$customer->updated_at = NULL;
+				$customer->credit_limits = $request->credit_limits;
+				$customer->credit_days = $request->credit_days;
 				$address = new Address;
 				$customer_details = new CustomerDetails;
 			} else {
 				$customer = Customer::withTrashed()->find($request->id);
 				$customer->updated_by_id = Auth::user()->id;
 				$customer->updated_at = Carbon::now();
+				$customer->credit_limits = $request->credit_limits;
+				$customer->credit_days = $request->credit_days;
 				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
 				//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 				$customer_details = CustomerDetails::where('customer_id', $request->id)->first();
