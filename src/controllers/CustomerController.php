@@ -3,10 +3,13 @@
 namespace Abs\CustomerPkg;
 use Abs\CustomerPkg\Customer;
 use App\Address;
+use App\City;
 use App\Country;
 use App\CustomerDetails;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\WpoSoapController;
 use App\State;
+use Artisaninweb\SoapWrapper\SoapWrapper;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -16,7 +19,10 @@ use Yajra\Datatables\Datatables;
 
 class CustomerController extends Controller {
 
-	public function __construct() {
+	public function __construct(SoapWrapper $soapWrapper, WpoSoapController $getSoap = null) {
+		$this->middleware('auth');
+		$this->soapWrapper = $soapWrapper;
+		$this->getSoap = $getSoap;
 	}
 
 	public function getCustomerFilterData(Request $request) {
@@ -243,11 +249,103 @@ class CustomerController extends Controller {
 	}
 
 	public function searchCustomer(Request $r) {
-		return Customer::searchCustomer($r);
+		// return Customer::searchCustomer($r);
+		$key = $r->key;
+
+		$this->soapWrapper->add('Customer', function ($service) {
+			$service
+				->wsdl('http://tvsapp.tvs.in/ongo/WebService.asmx?wsdl')
+				->trace(true);
+		});
+		$params = ['ACCOUNTNUM' => $r->key];
+		$getResult = $this->soapWrapper->call('Customer.GetNewCustMasterDetails_Search', [$params]);
+		$customer_data = $getResult->GetNewCustMasterDetails_SearchResult;
+		if (empty($customer_data)) {
+			return response()->json(['success' => false, 'error' => 'Customer Not Available!.']);
+		}
+
+		// Convert xml string into an object
+		$xml_customer_data = simplexml_load_string($customer_data->any);
+
+		// Convert into json
+		$customer_encode = json_encode($xml_customer_data);
+
+		// Convert into associative array
+		$customer_data = json_decode($customer_encode, true);
+
+		$api_customer_data = $customer_data['Table'];
+		if (count($api_customer_data) == 0) {
+			return response()->json(['success' => false, 'error' => 'Customer Not Available!.']);
+		}
+		// dd($api_customer_data);
+		$list = [];
+		if ($api_customer_data) {
+			$data = [];
+			foreach ($api_customer_data as $key => $customer_data)
+			// $primaryAddress = [];
+			{
+				$data['code'] = $customer_data['ACCOUNTNUM'];
+				$data['name'] = $customer_data['NAME'];
+				$data['address'] = $customer_data['ADDRESS'];
+				$data['gst_number'] = isset($customer_data['gst_number']) ? $customer_data['gst_number'] : NULL;
+				$city = City::where('name', $customer_data['CITY'])->first();
+				$data['primaryAddress']['state_id'] = $city->state_id;
+
+				$list[] = $data;
+			}
+		}
+		// dd($list);
+
+		return response()->json($list);
 	}
 
 	public function getCustomer(Request $request) {
-		return Customer::getCustomer($request);
+		// dd($request->all());
+		if ($request->code) {
+			$customer_data = $this->getSoap->getCustMasterDetails($request->code);
+
+			if (empty($customer_data)) {
+				return response()->json(['success' => false, 'error' => 'Customer Data Not Available!.']);
+			}
+			// dd($customer_data);
+			if ($customer_data) {
+				$customer = Customer::firstOrNew(['code' => $customer_data['code']]);
+				$customer->company_id = Auth::user()->company_id;
+				$customer->name = $customer_data['name'];
+				$customer->cust_group = $customer_data['cust_group'];
+				$customer->dimension = $customer_data['dimension'];
+				$customer->mobile_no = $customer_data['locator'];
+				$customer->address = $customer_data['address'];
+				$customer->city = $customer_data['city'];
+				$customer->zipcode = $customer_data['zipcode'];
+				$customer->created_at = Carbon::now();
+				$customer->save();
+
+				$address = Address::firstOrNew(['entity_id' => $customer->id, 'address_of_id' => 24]); //CUSTOMER
+				$address->entity_id = $customer->id;
+				$address->address_of_id = 24;
+				$address->address_type_id = 40;
+				$address->address_line1 = $customer_data['address'];
+				$city = City::where('name', $customer_data['city'])->first();
+				$state = State::find($city->state_id);
+				$address->country_id = $state->country_id;
+				$address->state_id = $state->id;
+				$address->city_id = $city->id;
+				$address->pincode = $customer_data['zipcode'];
+				$address->save();
+
+				$customer_get_data = Customer::with(['primaryAddress'])->where('company_id', Auth::user()->company_id)->find($customer->id);
+
+			} else {
+				$customer_get_data = [];
+			}
+		}
+
+		return response()->json([
+			'success' => true,
+			'customer' => $customer_get_data,
+		]);
+		// return Customer::getCustomer($request);
 	}
 
 }

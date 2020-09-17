@@ -27,4 +27,4 @@
     var customer_form_template_url = "{{URL::asset($customer_pkg_prefix.'/public/angular/customer-pkg/pages/customer/form.html')}}";
     var customer_delete_data_url = "{{url('customer-pkg/customer/delete/')}}";
 </script>
-<script type="text/javascript" src="{{URL::asset($customer_pkg_prefix.'/public/angular/customer-pkg/pages/customer/controller.js?v=2')}}"></script>
+<!-- <script type="text/javascript" src="{{URL::asset($customer_pkg_prefix.'/public/angular/customer-pkg/pages/customer/controller.js?v=2')}}"></script> -->

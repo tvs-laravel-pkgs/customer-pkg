@@ -16,6 +16,8 @@ class Customer extends BaseModel {
 	use SoftDeletes;
 	protected $table = 'customers';
 	public static $AUTO_GENERATE_CODE = false;
+	public static $ADDRESS_OF_ID = 24;
+	public static $PRIMARY_ADDRESS_TYPE_ID = 40;
 	public $timestamps = true;
 	protected $fillable = [
 		'code',
@@ -360,7 +362,9 @@ class Customer extends BaseModel {
 	}
 
 	public static function getCustomer($request) {
-		$customer = self::find($request->id);
+		// $customer = self::find($request->id);
+		$customer = self::with(['primaryAddress'])->where('company_id', Auth::user()->company_id)
+			->find($request->id);
 
 		if (!$customer) {
 			return response()->json(['success' => false, 'error' => 'Customer not found']);
