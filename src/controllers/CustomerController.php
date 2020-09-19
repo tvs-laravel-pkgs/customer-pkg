@@ -252,13 +252,13 @@ class CustomerController extends Controller {
 		// return Customer::searchCustomer($r);
 		$key = $r->key;
 
-		$this->soapWrapper->add('Customer', function ($service) {
+		$this->soapWrapper->add('customer', function ($service) {
 			$service
-				->wsdl('http://tvsapp.tvs.in/ongo/WebService.asmx?wsdl')
+				->wsdl('https://tvsapp.tvs.in/ongo/WebService.asmx?wsdl')
 				->trace(true);
 		});
 		$params = ['ACCOUNTNUM' => $r->key];
-		$getResult = $this->soapWrapper->call('Customer.GetNewCustMasterDetails_Search', [$params]);
+		$getResult = $this->soapWrapper->call('customer.GetNewCustMasterDetails_Search', [$params]);
 		$customer_data = $getResult->GetNewCustMasterDetails_SearchResult;
 		if (empty($customer_data)) {
 			return response()->json(['success' => false, 'error' => 'Customer Not Available!.']);
