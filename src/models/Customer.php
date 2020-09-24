@@ -375,19 +375,20 @@ class Customer extends BaseModel {
 	}
 
 	public static function saveCustomer($values) {
-		if (!$values['customer_id']) {
-			//NEW CUSTOMER
-			$customer = new Customer;
-			$customer->company_id = Auth::user()->company_id;
-			$customer->created_by_id = Auth::id();
-		} else {
-			$customer = Customer::find($values['customer_id']);
-			$customer->updated_by_id = Auth::id();
-		}
+		// if (!$values['customer_id']) {
+		// 	//NEW CUSTOMER
+		// 	$customer = new Customer;
+		// 	$customer->company_id = Auth::user()->company_id;
+		// 	$customer->created_by_id = Auth::id();
+		// } else {
+		// 	$customer = Customer::find($values['customer_id']);
+		// 	$customer->updated_by_id = Auth::id();
+		// }
+		// if (!isset($values['code']) || !$values['code']) {
+		// 	$customer->code = rand();
+		// }
+		$customer = Customer::firstOrNew(['code' => $values['code']]);
 		$customer->fill($values);
-		if (!isset($values['code']) || !$values['code']) {
-			$customer->code = rand();
-		}
 		$customer->save();
 		// if (!isset($values['code']) || !$values['code']) {
 		// 	$customer->code = $customer->id;
