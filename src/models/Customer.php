@@ -347,7 +347,10 @@ class Customer extends BaseModel {
 				'id',
 				'name',
 				'code',
-				'gst_number'
+				'gst_number',
+				'pan_number',
+				'mobile_no',
+				'email'
 			)
 			->where(function ($q) use ($key) {
 				$q->where('name', 'like', $key . '%')
@@ -372,13 +375,13 @@ class Customer extends BaseModel {
 	}
 
 	public static function saveCustomer($values) {
-		if (!$values['id']) {
+		if (!$values['customer_id']) {
 			//NEW CUSTOMER
 			$customer = new Customer;
 			$customer->company_id = Auth::user()->company_id;
 			$customer->created_by_id = Auth::id();
 		} else {
-			$customer = Customer::find($values['id']);
+			$customer = Customer::find($values['customer_id']);
 			$customer->updated_by_id = Auth::id();
 		}
 		$customer->fill($values);
