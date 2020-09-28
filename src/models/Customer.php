@@ -398,7 +398,7 @@ class Customer extends BaseModel {
 	}
 	public function saveAddress($values) {
 		$address = Address::firstOrNew([
-			'company_id' => $this->company_id,
+			'company_id' => Auth::user()->company_id,
 			'address_of_id' => 24, //CUSTOMER
 			'entity_id' => $this->id,
 			'address_type_id' => 40, //PRIMARY ADDRESS
