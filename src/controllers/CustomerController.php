@@ -250,6 +250,7 @@ class CustomerController extends Controller {
 
 	public function searchCustomer(Request $r) {
 		// return Customer::searchCustomer($r);
+		// dump(strlen($r->key));
 		$key = $r->key;
 
 		$this->soapWrapper->add('customer', function ($service) {
@@ -303,140 +304,124 @@ class CustomerController extends Controller {
 		return response()->json($list);
 	}
 
-	public function getCustomer(Request $request) {
-		// dump($request->data['code']);
+	public function getCustomerAddress(Request $request) {
 		// dd($request->all());
-
-		// $this->soapWrapper->add('address', function ($service) {
-		// 	$service
-		// 		->wsdl('https://tvsapp.tvs.in/ongo/WebService.asmx?wsdl')
-		// 		->trace(true);
-		// });
-		// $params = ['ACCOUNTNUM' => $request->data['code']];
-		// $getResult = $this->soapWrapper->call('address.GetNewCustomerAddress_Search', [$params]);
-		// $customer_data = $getResult->GetNewCustomerAddress_SearchResult;
-		// if (empty($customer_data)) {
-		// 	return response()->json(['success' => false, 'error' => 'Address Not Available!.']);
-		// }
-
-		// // Convert xml string into an object
-		// $xml_customer_data = simplexml_load_string($customer_data->any);
-		// // dd($xml_customer_data);
-
-		// // Convert into json
-		// $customer_encode = json_encode($xml_customer_data);
-
-		// // Convert into associative array
-		// $customer_data = json_decode($customer_encode, true);
-		// // dd($customer_data);
-
-		// $api_customer_data = $customer_data['Table'];
-		// if (count($api_customer_data) == 0) {
-		// 	return response()->json(['success' => false, 'error' => 'Address Not Available!.']);
-		// }
-
-		// $customer = Customer::firstOrNew(['code' => $request->data['code']]);
-		// $customer->company_id = Auth::user()->company_id;
-		// $customer->name = $request->data['name'];
-		// $customer->cust_group = $request->data['cust_group'] == 'Not available' ? NULL : $request->data['cust_group'];
-		// $customer->gst_number = $request->data['gst_number'] ? $request->data['gst_number'] : NULL;
-		// $customer->pan_number = $request->data['pan_number'] == 'Not available' ? NULL : $request->data['pan_number'];
-		// $customer->mobile_no = $request->data['mobile_no'] == 'Not available' ? NULL : $request->data['mobile_no'];
-		// $customer->address = NULL;
-		// $customer->city = NULL; //$customer_data['CITY'];
-		// $customer->zipcode = NULL; //$customer_data['ZIPCODE'];
-		// $customer->created_at = Carbon::now();
-		// $customer->save();
-		// dd($customer->id);
-		// // dd($api_customer_data);
-		// $list = [];
-		// if ($api_customer_data) {
-		// 	$data = [];
-		// 	if (count($api_customer_data) > 0) {
-		// 		// $i = 0;
-		// 		foreach ($api_customer_data as $key => $customer_data) {
-		// 			// $sno = $i;
-		// 			// if (!empty($customer_data['ZIPCODE'])) {
-		// 			// 	dump($customer_data['ZIPCODE']);
-		// 			// 	dump($customer_data['ADDRESS']);
-		// 			// 	dump('in');
-		// 			// }
-		// 			// dump('out');
-		// 			// dd($customer_data);
-
-		// 			// dd(trim($customer_data['ADDRESS'], '"'));
-		// 			$address = Address::firstOrNew(['entity_id' => $customer->id, 'address_of_id' => 24]); //CUSTOMER
-		// 			$address->entity_id = $customer->id;
-		// 			$address->address_of_id = 24;
-		// 			$address->address_type_id = 40;
-		// 			$address->address_line1 = str_replace('""', '', $customer_data['ADDRESS']);
-		// 			$city = City::where('name', $customer_data['CITY'])->first();
-		// 			// if ($city) {
-		// 			$state = State::where('code', $customer_data['STATE'])->first();
-		// 			$address->country_id = $state ? $state->country_id : NULL;
-		// 			$address->state_id = $state ? $state->id : NULL;
-		// 			// }
-		// 			$address->city_id = $city ? $city->id : NULL;
-		// 			$address->pincode = !empty($customer_data['ZIPCODE']) ? $customer_data['ZIPCODE'] : NULL;
-		// 			$address->save();
-
-		// 			$customer_get_data = Customer::with(['primaryAddresses'])->where('company_id', Auth::user()->company_id)->find($customer->id);
-		// 			// $i++;
-		// 		}
-		// 		// dump($i);
-		// 		// dd($customer_get_data);
-		// 	} else {
-		// 		$customer_get_data = [];
-		// 	}
-		// }
-		// dd(1);
-		if ($request->data['code']) {
-			$customer_data = $this->getSoap->getCustMasterDetails($request->data['code']);
-
-			if (empty($customer_data)) {
-				return response()->json(['success' => false, 'error' => 'Customer Data Not Available!.']);
-			}
-			// dd($customer_data);
-			if ($customer_data) {
-				$customer = Customer::firstOrNew(['code' => $customer_data['code']]);
-				$customer->company_id = Auth::user()->company_id;
-				$customer->name = $customer_data['name'];
-				$customer->cust_group = $customer_data['cust_group'];
-				$customer->dimension = $customer_data['dimension'];
-				$customer->mobile_no = $customer_data['locator'];
-				$customer->address = $customer_data['address'];
-				$customer->city = $customer_data['city'];
-				$customer->zipcode = $customer_data['zipcode'];
-				$customer->created_at = Carbon::now();
-				$customer->save();
-
-				$address = Address::firstOrNew(['entity_id' => $customer->id, 'address_of_id' => 24]); //CUSTOMER
-				$address->entity_id = $customer->id;
-				$address->address_of_id = 24;
-				$address->address_type_id = 40;
-				$address->address_line1 = $customer_data['address'];
-				$city = City::where('name', $customer_data['city'])->first();
-				if ($city) {
-					$state = State::find($city->state_id);
-					$address->country_id = $state->country_id;
-					$address->state_id = $state->id;
-				}
-				$address->city_id = $city ? $city->id : NULL;
-				$address->pincode = $customer_data['zipcode'];
-				$address->save();
-
-				$customer_get_data = Customer::with(['primaryAddress'])->where('company_id', Auth::user()->company_id)->find($customer->id);
-
-			} else {
-				$customer_get_data = [];
-			}
+		$this->soapWrapper->add('address', function ($service) {
+			$service
+				->wsdl('https://tvsapp.tvs.in/ongo/WebService.asmx?wsdl')
+				->trace(true);
+		});
+		$params = ['ACCOUNTNUM' => $request->data['code']];
+		$getResult = $this->soapWrapper->call('address.GetNewCustomerAddress_Search', [$params]);
+		$customer_data = $getResult->GetNewCustomerAddress_SearchResult;
+		if (empty($customer_data)) {
+			return response()->json(['success' => false, 'error' => 'Address Not Available!.']);
 		}
 
+		// Convert xml string into an object
+		$xml_customer_data = simplexml_load_string($customer_data->any);
+		// dd($xml_customer_data);
+
+		// Convert into json
+		$customer_encode = json_encode($xml_customer_data);
+
+		// Convert into associative array
+		$customer_data = json_decode($customer_encode, true);
+		// dd($customer_data);
+
+		$api_customer_data = $customer_data['Table'];
+		// dd($api_customer_data);
+		if (count($api_customer_data) == 0) {
+			return response()->json(['success' => false, 'error' => 'Address Not Available!.']);
+		}
+
+		$customer = Customer::firstOrNew(['code' => $request->data['code']]);
+		$customer->company_id = Auth::user()->company_id;
+		$customer->name = $request->data['name'];
+		$customer->cust_group = $request->data['cust_group'] == 'Not available' ? NULL : $request->data['cust_group'];
+		$customer->gst_number = isset($request->data['gst_number']) ? $request->data['gst_number'] : NULL;
+		$customer->pan_number = $request->data['pan_number'] == 'Not available' ? NULL : $request->data['pan_number'];
+		$customer->mobile_no = $request->data['mobile_no'] == 'Not available' ? NULL : $request->data['mobile_no'];
+		$customer->address = NULL;
+		$customer->city = NULL; //$customer_data['CITY'];
+		$customer->zipcode = NULL; //$customer_data['ZIPCODE'];
+		$customer->created_at = Carbon::now();
+		// $customer->save();
+		// dd($customer->id);
+		dd(count($api_customer_data));
+		$list = [];
+		if ($api_customer_data) {
+			$data = [];
+			if (count($api_customer_data) > 10) {
+				// $i = 0;
+				foreach ($api_customer_data as $key => $customer_data) {
+					// dd($customer_data);
+
+					$address = Address::firstOrNew(['entity_id' => $customer->id, 'ax_id' => $customer_data['RECID']]); //CUSTOMER
+					// dd($address);
+					$address->company_id = Auth::user()->company_id;
+					$address->entity_id = $customer->id;
+					$address->ax_id = $customer_data['RECID'];
+					$address->gst_number = isset($customer_data['GST_NUMBER']) ? $customer_data['GST_NUMBER'] : NULL;
+					$address->address_of_id = 24;
+					$address->address_type_id = 40;
+					$address->name = 'Primary Address_' . $customer_data['RECID'];
+					$address->address_line1 = str_replace('""', '', $customer_data['ADDRESS']);
+					$city = City::where('name', $customer_data['CITY'])->first();
+					// if ($city) {
+					$state = State::where('code', $customer_data['STATE'])->first();
+					$address->country_id = $state ? $state->country_id : NULL;
+					$address->state_id = $state ? $state->id : NULL;
+					// }
+					$address->city_id = $city ? $city->id : NULL;
+					$address->pincode = !empty($customer_data['ZIPCODE']) ? $customer_data['ZIPCODE'] : NULL;
+					$address->save();
+					// dd($address);
+					$customer_address[] = $address;
+					// $i++;
+				}
+				// dump($i);
+				// dd($customer_get_data);
+			} elseif (count($api_customer_data) >= 9) {
+				// dd('in');
+				// dd($api_customer_data['RECID']);
+				$address = Address::firstOrNew(['entity_id' => $customer->id, 'ax_id' => $api_customer_data['RECID']]); //CUSTOMER
+				// dd($address);
+				$address->company_id = Auth::user()->company_id;
+				$address->entity_id = $customer->id;
+				$address->ax_id = $api_customer_data['RECID'];
+				$address->gst_number = isset($api_customer_data['GST_NUMBER']) ? $api_customer_data['GST_NUMBER'] : NULL;
+				$address->address_of_id = 24;
+				$address->address_type_id = 40;
+				$address->name = 'Primary Address_' . $api_customer_data['RECID'];
+				$address->address_line1 = str_replace('""', '', $api_customer_data['ADDRESS']);
+				$city = City::where('name', $api_customer_data['CITY'])->first();
+				// if ($city) {
+				$state = State::where('code', $api_customer_data['STATE'])->first();
+				$address->country_id = $state ? $state->country_id : NULL;
+				$address->state_id = $state ? $state->id : NULL;
+				// }
+				$address->city_id = $city ? $city->id : NULL;
+				$address->pincode = !empty($api_customer_data['ZIPCODE']) ? $api_customer_data['ZIPCODE'] : NULL;
+				$address->save();
+				// dd($address);
+				$customer_address[] = $address;
+				// $customer_get_data = Customer::with(['primaryAddresses'])->where('company_id', Auth::user()->company_id)->find($customer->id);
+			} else {
+				// $customer_get_data = [];
+				$customer_address = [];
+			}
+
+		}
 		return response()->json([
 			'success' => true,
-			'customer' => $customer_get_data,
+			'customer_address' => $customer_address,
+			'customer' => $customer,
 		]);
-		// return Customer::getCustomer($request);
+	}
+
+	public function getCustomerSave(Request $request) {
+		return Customer::getCustomer($request);
 	}
 
 }
