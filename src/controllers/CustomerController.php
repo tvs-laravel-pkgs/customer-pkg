@@ -324,10 +324,10 @@ class CustomerController extends Controller {
 
 		// Convert into json
 		$customer_encode = json_encode($xml_customer_data);
-
 		// Convert into associative array
 		$customer_data = json_decode($customer_encode, true);
 		// dd($customer_data);
+		// dd($customer_data['Table']);
 
 		$api_customer_data = $customer_data['Table'];
 		// dd($api_customer_data);
@@ -348,65 +348,69 @@ class CustomerController extends Controller {
 		$customer->created_at = Carbon::now();
 		// $customer->save();
 		// dd($customer->id);
-		dd(count($api_customer_data));
+		// dd($api_customer_data);
 		$list = [];
 		if ($api_customer_data) {
 			$data = [];
-			if (count($api_customer_data) > 10) {
-				// $i = 0;
-				foreach ($api_customer_data as $key => $customer_data) {
-					// dd($customer_data);
+			if (isset($api_customer_data)) {
+				$array_count = array_filter($api_customer_data, 'is_array');
+				if (count($array_count) > 0) {
+					// dd('mu;l');
+					// $i = 0;
+					// dd($api_customer_data);
+					foreach ($api_customer_data as $key => $customer_data) {
 
-					$address = Address::firstOrNew(['entity_id' => $customer->id, 'ax_id' => $customer_data['RECID']]); //CUSTOMER
+						$address = Address::firstOrNew(['entity_id' => $customer->id, 'ax_id' => $customer_data['RECID']]); //CUSTOMER
+						// dd($address);
+						$address->company_id = Auth::user()->company_id;
+						$address->entity_id = $customer->id;
+						$address->ax_id = $customer_data['RECID'];
+						$address->gst_number = isset($customer_data['GST_NUMBER']) ? $customer_data['GST_NUMBER'] : NULL;
+						$address->address_of_id = 24;
+						$address->address_type_id = 40;
+						$address->name = 'Primary Address_' . $customer_data['RECID'];
+						$address->address_line1 = str_replace('""', '', $customer_data['ADDRESS']);
+						$city = City::where('name', $customer_data['CITY'])->first();
+						// if ($city) {
+						$state = State::where('code', $customer_data['STATE'])->first();
+						$address->country_id = $state ? $state->country_id : NULL;
+						$address->state_id = $state ? $state->id : NULL;
+						// }
+						$address->city_id = $city ? $city->id : NULL;
+						$address->pincode = $customer_data['ZIPCODE'] == 'Not available' ? NULL : $customer_data['ZIPCODE'];
+						$address->save();
+						// dd($address);
+						$customer_address[] = $address;
+						// $i++;
+					}
+					// dump($i);
+					// dd($customer_get_data);
+				} else {
+					// dd('sing');
+					// dd($api_customer_data['RECID']);
+					$address = Address::firstOrNew(['entity_id' => $customer->id, 'ax_id' => $api_customer_data['RECID']]); //CUSTOMER
 					// dd($address);
 					$address->company_id = Auth::user()->company_id;
 					$address->entity_id = $customer->id;
-					$address->ax_id = $customer_data['RECID'];
-					$address->gst_number = isset($customer_data['GST_NUMBER']) ? $customer_data['GST_NUMBER'] : NULL;
+					$address->ax_id = $api_customer_data['RECID'];
+					$address->gst_number = isset($api_customer_data['GST_NUMBER']) ? $api_customer_data['GST_NUMBER'] : NULL;
 					$address->address_of_id = 24;
 					$address->address_type_id = 40;
-					$address->name = 'Primary Address_' . $customer_data['RECID'];
-					$address->address_line1 = str_replace('""', '', $customer_data['ADDRESS']);
-					$city = City::where('name', $customer_data['CITY'])->first();
+					$address->name = 'Primary Address_' . $api_customer_data['RECID'];
+					$address->address_line1 = str_replace('""', '', $api_customer_data['ADDRESS']);
+					$city = City::where('name', $api_customer_data['CITY'])->first();
 					// if ($city) {
-					$state = State::where('code', $customer_data['STATE'])->first();
+					$state = State::where('code', $api_customer_data['STATE'])->first();
 					$address->country_id = $state ? $state->country_id : NULL;
 					$address->state_id = $state ? $state->id : NULL;
 					// }
 					$address->city_id = $city ? $city->id : NULL;
-					$address->pincode = !empty($customer_data['ZIPCODE']) ? $customer_data['ZIPCODE'] : NULL;
+					$address->pincode = $api_customer_data['ZIPCODE'] == 'Not available' ? NULL : $api_customer_data['ZIPCODE'];
 					$address->save();
 					// dd($address);
 					$customer_address[] = $address;
-					// $i++;
+					// $customer_get_data = Customer::with(['primaryAddresses'])->where('company_id', Auth::user()->company_id)->find($customer->id);
 				}
-				// dump($i);
-				// dd($customer_get_data);
-			} elseif (count($api_customer_data) >= 9) {
-				// dd('in');
-				// dd($api_customer_data['RECID']);
-				$address = Address::firstOrNew(['entity_id' => $customer->id, 'ax_id' => $api_customer_data['RECID']]); //CUSTOMER
-				// dd($address);
-				$address->company_id = Auth::user()->company_id;
-				$address->entity_id = $customer->id;
-				$address->ax_id = $api_customer_data['RECID'];
-				$address->gst_number = isset($api_customer_data['GST_NUMBER']) ? $api_customer_data['GST_NUMBER'] : NULL;
-				$address->address_of_id = 24;
-				$address->address_type_id = 40;
-				$address->name = 'Primary Address_' . $api_customer_data['RECID'];
-				$address->address_line1 = str_replace('""', '', $api_customer_data['ADDRESS']);
-				$city = City::where('name', $api_customer_data['CITY'])->first();
-				// if ($city) {
-				$state = State::where('code', $api_customer_data['STATE'])->first();
-				$address->country_id = $state ? $state->country_id : NULL;
-				$address->state_id = $state ? $state->id : NULL;
-				// }
-				$address->city_id = $city ? $city->id : NULL;
-				$address->pincode = !empty($api_customer_data['ZIPCODE']) ? $api_customer_data['ZIPCODE'] : NULL;
-				$address->save();
-				// dd($address);
-				$customer_address[] = $address;
-				// $customer_get_data = Customer::with(['primaryAddresses'])->where('company_id', Auth::user()->company_id)->find($customer->id);
 			} else {
 				// $customer_get_data = [];
 				$customer_address = [];
