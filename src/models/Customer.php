@@ -756,10 +756,17 @@ class Customer extends BaseModel {
 			$trade_name = NULL;
 		}
 
-		return response()->json([
-			'success' => true,
-			'trade_name' => $trade_name,
-		]);
+		if ($trade_name) {
+			return response()->json([
+				'success' => true,
+				'trade_name' => $trade_name,
+			]);
+		} else {
+			return response()->json([
+				'success' => false,
+				'error' => 'Customer Name not found!',
+			]);
+		}
 	}
 
 }
