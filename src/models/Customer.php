@@ -761,7 +761,12 @@ class Customer extends BaseModel {
 				if ($legal_name[0] == ' LegalName') {
 					$legal_name = $legal_name[1];
 				} else {
-					$legal_name = NULL;
+					$legal_name = explode("=", $gst_validate[4]); // ERROR FOUND SO THIS ONLY ADDED FOR CUSTOMER CODE "CBE_909228"
+					if ($legal_name[0] == ' LegalName') {
+						$legal_name = $legal_name[1];
+					} else {
+						$legal_name = NULL;
+					}
 				}
 			}
 		} else {
