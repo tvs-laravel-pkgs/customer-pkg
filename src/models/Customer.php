@@ -564,7 +564,8 @@ class Customer extends BaseModel {
 		// dump($aes_decoded_plain_text);
 
 		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
-		$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
+		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
+		$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
 		// dd($bdo_check_gstin_url);
 
 		$ch = curl_init($bdo_check_gstin_url);
@@ -745,21 +746,35 @@ class Customer extends BaseModel {
 			}
 		}
 
-		if ($gst_validate[0]) {
-			$trade_name = explode("=", $gst_validate[0]);
-			if ($trade_name[0] == 'TradeName') {
-				$trade_name = $trade_name[1];
-			} else {
-				$trade_name = NULL;
+		if ($gst_validate) {
+			if ($gst_validate[0]) {
+				$trade_name = explode("=", $gst_validate[0]);
+				if ($trade_name[0] == 'TradeName') {
+					$trade_name = $trade_name[1];
+				} else {
+					$trade_name = NULL;
+				}
+			}
+
+			if ($gst_validate[3]) {
+				$legal_name = explode("=", $gst_validate[3]);
+				if ($legal_name[0] == ' LegalName') {
+					$legal_name = $legal_name[1];
+				} else {
+					$legal_name = NULL;
+				}
 			}
 		} else {
-			$trade_name = NULL;
+			return response()->json([
+				'success' => false,
+				'error' => 'Server went wrong. Try again later!',
+			]);
 		}
 
-		if ($trade_name) {
+		if ($legal_name) {
 			return response()->json([
 				'success' => true,
-				'trade_name' => $trade_name,
+				'trade_name' => $legal_name, //LEGAL NAME WILL BE PASSED Change on 23 OCT 2020 BECAUSE OF NEW API UT PARAMETER WON"T CHANGE
 			]);
 		} else {
 			return response()->json([
