@@ -427,7 +427,6 @@ class Customer extends BaseModel {
 			]);
 		}
 		$rsa = new Crypt_RSA;
-		$encrypter = app('Illuminate\Contracts\Encryption\Encrypter');
 
 		$public_key = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxqHazGS4OkY/bDp0oklL+Ser7EpTpxyeMop8kfBlhzc8dzWryuAECwu8i/avzL4f5XG/DdSgMz7EdZCMrcxtmGJlMo2tUqjVlIsUslMG6Cmn46w0u+pSiM9McqIvJgnntKDHg90EIWg1BNnZkJy1NcDrB4O4ea66Y6WGNdb0DxciaYRlToohv8q72YLEII/z7W/7EyDYEaoSlgYs4BUP69LF7SANDZ8ZuTpQQKGF4TJKNhJ+ocmJ8ahb2HTwH3Ol0THF+0gJmaigs8wcpWFOE2K+KxWfyX6bPBpjTzC+wQChCnGQREhaKdzawE/aRVEVnvWc43dhm0janHp29mAAVv+ngYP9tKeFMjVqbr8YuoT2InHWFKhpPN8wsk30YxyDvWkN3mUgj3Q/IUhiDh6fU8GBZ+iIoxiUfrKvC/XzXVsCE2JlGVceuZR8OzwGrxk+dvMnVHyauN1YWnJuUTYTrCw3rgpNOyTWWmlw2z5dDMpoHlY0WmTVh0CrMeQdP33D3LGsa+7JYRyoRBhUTHepxLwk8UiLbu6bGO1sQwstLTTmk+Z9ZSk9EUK03Bkgv0hOmSPKC4MLD5rOM/oaP0LLzZ49jm9yXIrgbEcn7rv82hk8ghqTfChmQV/q+94qijf+rM2XJ7QX6XBES0UvnWnV6bVjSoLuBi9TF1ttLpiT3fkCAwEAAQ=='; //PROVIDE FROM BDO COMPANY
 
@@ -439,19 +438,19 @@ class Customer extends BaseModel {
 
 		$rsa->loadKey($public_key);
 		$rsa->setEncryptionMode(2);
-		// $client_encryption_key = 'BBAkBDB0YzZiYThkYTg4ZDZBBDJjZBUyBGFkBBB0BWB='; // CLIENT SECRET KEY
-		// $client_encryption_key = 'TQAkSDQ0YzZiYTTkYTg4ZDZSSDJjZSUySGFkSSQ0SWQ='; // CLIENT SECRET KEY
-		$client_encryption_key = '7dd55886594bccadb03c48eb3f448e'; // LIVE
+		// $data = 'BBAkBDB0YzZiYThkYTg4ZDZBBDJjZBUyBGFkBBB0BWB='; // CLIENT SECRET KEY
+		// $data = 'TQAkSDQ0YzZiYTTkYTg4ZDZSSDJjZSUySGFkSSQ0SWQ='; // CLIENT SECRET KEY
+		$data = '7dd55886594bccadb03c48eb3f448e'; // LIVE
 
-		$ClientSecret = $rsa->encrypt($client_encryption_key);
+		$ClientSecret = $rsa->encrypt($data);
 		$clientsecretencrypted = base64_encode($ClientSecret);
 		// dump('ClientSecret ' . $clientsecretencrypted);
 
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$app_secret_key = substr(str_shuffle($characters), 0, 32); // RANDOM KEY GENERATE
-		// $app_key_data = 'Rdp5EB5w756dVph0C3jCXY1K6RPC6RCD'; // RANDOM KEY GENERATE
-		// dump($app_key_data);
-		$AppSecret = $rsa->encrypt($app_secret_key);
+		$data = substr(str_shuffle($characters), 0, 32); // RANDOM KEY GENERATE
+		// $data = 'Rdp5EB5w756dVph0C3jCXY1K6RPC6RCD'; // RANDOM KEY GENERATE
+		// dump($data);
+		$AppSecret = $rsa->encrypt($data);
 		$appsecretkey = base64_encode($AppSecret);
 		// dump('appsecretkey ' . $appsecretkey);
 
@@ -480,8 +479,7 @@ class Customer extends BaseModel {
 
 		// Get the POST request header status
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		// dd($status);
-		// dd($server_output_data);
+
 		// If header status is not Created or not OK, return error message
 		if ($status != 200) {
 			$errors[] = 'Connection Error!';
@@ -523,13 +521,47 @@ class Customer extends BaseModel {
 		$bdo_authtoken = $server_output->bdo_authtoken;
 		$status = $server_output->status;
 		$bdo_sek = $server_output->bdo_sek;
+		// dump($bdo_sek);
 
-		//DECRYPT WITH APP KEY AND BDO SEK KEY
-		$decrypt_data_with_bdo_sek = self::decryptAesData($app_secret_key, $bdo_sek);
-		if (!$decrypt_data_with_bdo_sek) {
-			$errors[] = 'Decryption Error!';
-			return response()->json(['success' => false, 'error' => 'Decryption Error!']);
+		$aes_decrypt_url = 'https://www.devglan.com/online-tools/aes-decryption';
+
+		$ch = curl_init($aes_decrypt_url);
+
+		// Setup request to send json via POST`
+		$params = json_encode(array(
+			'textToDecrypt' => $bdo_sek,
+			'secretKey' => $data,
+			'mode' => 'ECB',
+			'keySize' => '256',
+			'dataFormat' => 'Base64',
+		));
+
+		// Attach encoded JSON string to the POST fields
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+		// Set the content type to application/json
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+		// Return response instead of outputting
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		// Execute the POST request
+		$server_output = curl_exec($ch);
+
+		// Get the POST request header status
+		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		// If header status is not Created or not OK, return error message
+		if ($status != 200) {
+			$errors[] = 'Connection Error!';
+			return response()->json(['success' => false, 'error' => 'Connection Error!']);
 		}
+
+		curl_close($ch);
+
+		$server_output = json_decode($server_output);
+
+		$aes_decoded_plain_text = base64_decode($server_output->output);
+		// dump($aes_decoded_plain_text);
 
 		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
 		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
@@ -594,15 +626,53 @@ class Customer extends BaseModel {
 		}
 		curl_close($ch);
 
-		//AES DECRYPTION AFTER GENERATE IRN (DECRYPT WITH DECRYPT ENCODED DATA FROM AES DECRYPTION AND GSTIN DATA RESPONSE)
-		$gstin_decrypt_data = self::decryptAesData($decrypt_data_with_bdo_sek, $get_gstin_output->Data);
-		if (!$gstin_decrypt_data) {
-			$errors[] = 'Decryption Error!';
-			return response()->json(['success' => false, 'error' => 'Decryption Error!']);
-		}
+		//AES DECRYPTION AFTER GENERATE IRN
+		$aes_decrypt_url = 'https://www.devglan.com/online-tools/aes-decryption';
 
+		$ch = curl_init($aes_decrypt_url);
+
+		// Setup request to send json via POST`
+		$params = json_encode(array(
+			'textToDecrypt' => $get_gstin_output->Data,
+			'secretKey' => $aes_decoded_plain_text, //PLAIN TEXT GET FROM DECODE
+			'mode' => 'ECB',
+			'keySize' => '256',
+			'dataFormat' => 'Base64',
+		));
+
+		// Attach encoded JSON string to the POST fields
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+		// Set the content type to application/json
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+		// Return response instead of outputting
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		// Execute the POST request
+		$server_output = curl_exec($ch);
+		// dump($server_output);
+
+		// Get the POST request header status
+		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		// dump('final status check: ' . $status);
+		// If header status is not Created or not OK, return error message
+		if ($status != 200) {
+			$errors[] = 'Connection Error!';
+			return [
+				'success' => false,
+				'error' => 'Connection Error!',
+			];
+		}
+		// dd(1);
+
+		curl_close($ch);
+
+		$final_encrypt_output = json_decode($server_output);
+
+		$aes_final_decoded_plain_text = base64_decode($final_encrypt_output->output);
 		// dump($aes_final_decoded_plain_text);
-		$aes_final_decoded_plain_text = explode(',', $gstin_decrypt_data);
+		$aes_final_decoded_plain_text = explode(',', $aes_final_decoded_plain_text);
 
 		$remove_open = str_replace("{", "", $aes_final_decoded_plain_text);
 		// dump($remove_open);
@@ -717,15 +787,6 @@ class Customer extends BaseModel {
 				'error' => 'Customer Name not found!',
 			]);
 		}
-	}
-
-	public static function decryptAesData($app_secret_key, $bdo_sek_data) {
-		$method = 'aes-256-ecb';
-
-		$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($method));
-
-		$decrypted = openssl_decrypt(base64_decode($bdo_sek_data), $method, $app_secret_key, OPENSSL_RAW_DATA, $iv);
-		return $decrypted;
 	}
 
 }
