@@ -676,26 +676,17 @@ class Customer extends BaseModel {
 			}
 		}
 
+		$legal_name = NULL;
 		if ($gst_validate) {
-			if ($gst_validate[0]) {
-				$trade_name = explode("=", $gst_validate[0]);
-				if ($trade_name[0] == 'TradeName') {
-					$trade_name = $trade_name[1];
-				} else {
-					$trade_name = NULL;
-				}
-			}
-
-			if ($gst_validate[3]) {
-				$legal_name = explode("=", $gst_validate[3]);
-				if ($legal_name[0] == ' LegalName') {
-					$legal_name = $legal_name[1];
-				} else {
-					$legal_name = explode("=", $gst_validate[4]); // ERROR FOUND SO THIS ONLY ADDED FOR CUSTOMER CODE "CBE_909228"
-					if ($legal_name[0] == ' LegalName') {
-						$legal_name = $legal_name[1];
-					} else {
-						$legal_name = NULL;
+			foreach ($gst_validate as $value) {
+				if (!empty($value)) {
+					if ((strpos($value, " LegalName=") !== false)) {
+						$legal_name = explode("=", $value);
+						if ($legal_name[0] == ' LegalName') {
+							$legal_name = $legal_name[1];
+						} else {
+							$legal_name = NULL;
+						}
 					}
 				}
 			}
