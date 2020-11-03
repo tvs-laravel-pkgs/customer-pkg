@@ -5,6 +5,7 @@ use Abs\CustomerPkg\Customer;
 use App\Address;
 use App\City;
 use App\Country;
+use App\Outlet;
 use App\CustomerDetails;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WpoSoapController;
@@ -130,6 +131,15 @@ class CustomerController extends Controller {
 		$this->data['action'] = $action;
 		$this->data['customer_details'] = $customer_details;
 
+		//Outlet by Karthick T on 23-10-2020
+		$this->data['outlet_list'] = $outlet_list = Collect(
+				Outlet::select(
+					'id',
+					'code'
+				)->where('company_id',Auth::user()->company_id)
+				->get()
+			)->prepend(['id' => '', 'code' => 'Select Outlet']);
+
 		return response()->json($this->data);
 	}
 
@@ -207,6 +217,8 @@ class CustomerController extends Controller {
 			}
 			$customer->gst_number = $request->gst_number;
 			$customer->axapta_location_id = $request->axapta_location_id;
+			//Outlet by Karthick T on 23-10-2020
+			$customer->outlet_id = $request->outlet_id;
 			$customer->save();
 
 			if (!$address) {

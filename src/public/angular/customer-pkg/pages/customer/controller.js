@@ -134,7 +134,7 @@ app.component('customerList', {
         $('#email').on('keyup', function() {
             dataTables.fnFilter();
         });
-        $scope.onSelectedState = function(id){
+        $scope.onSelectedState = function(id) {
             $('#state_id').val(id);
             customer_get_city_by_state = vendor_get_city_by_state
             $http.post(
@@ -145,7 +145,7 @@ app.component('customerList', {
             });
             dataTables.fnFilter();
         }
-        $scope.onSelectedCity = function(id){
+        $scope.onSelectedCity = function(id) {
             $('#city_id').val(id);
             dataTables.fnFilter();
         }
@@ -194,6 +194,8 @@ app.component('customerForm', {
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
                 self.city_list = [{ 'id': '', 'name': 'Select City' }];
             }
+            //Outlet by Karthick T on 23-10-2020
+            self.outlet_list = response.data.outlet_list;
         });
 
         /* Tab Funtion */
