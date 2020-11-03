@@ -412,4 +412,318 @@ class Customer extends BaseModel {
 		return $this->hasMany('Abs\InvoicePkg\Invoice', 'customer_id'); //->where('entity_type_id',);
 	}
 
+	public static function getGstDetail($gstin) {
+		// dd($gstin);
+		$errors = [];
+		if (!$gstin) {
+			return response()->json([
+				'success' => false,
+				'error' => 'GSTIN is Empty!',
+			]);
+		}
+		$rsa = new Crypt_RSA;
+		$encrypter = app('Illuminate\Contracts\Encryption\Encrypter');
+
+		$public_key = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxqHazGS4OkY/bDp0oklL+Ser7EpTpxyeMop8kfBlhzc8dzWryuAECwu8i/avzL4f5XG/DdSgMz7EdZCMrcxtmGJlMo2tUqjVlIsUslMG6Cmn46w0u+pSiM9McqIvJgnntKDHg90EIWg1BNnZkJy1NcDrB4O4ea66Y6WGNdb0DxciaYRlToohv8q72YLEII/z7W/7EyDYEaoSlgYs4BUP69LF7SANDZ8ZuTpQQKGF4TJKNhJ+ocmJ8ahb2HTwH3Ol0THF+0gJmaigs8wcpWFOE2K+KxWfyX6bPBpjTzC+wQChCnGQREhaKdzawE/aRVEVnvWc43dhm0janHp29mAAVv+ngYP9tKeFMjVqbr8YuoT2InHWFKhpPN8wsk30YxyDvWkN3mUgj3Q/IUhiDh6fU8GBZ+iIoxiUfrKvC/XzXVsCE2JlGVceuZR8OzwGrxk+dvMnVHyauN1YWnJuUTYTrCw3rgpNOyTWWmlw2z5dDMpoHlY0WmTVh0CrMeQdP33D3LGsa+7JYRyoRBhUTHepxLwk8UiLbu6bGO1sQwstLTTmk+Z9ZSk9EUK03Bkgv0hOmSPKC4MLD5rOM/oaP0LLzZ49jm9yXIrgbEcn7rv82hk8ghqTfChmQV/q+94qijf+rM2XJ7QX6XBES0UvnWnV6bVjSoLuBi9TF1ttLpiT3fkCAwEAAQ=='; //PROVIDE FROM BDO COMPANY
+
+		// $clientid = "prakashr@featsolutions.in"; //PROVIDE FROM BDO COMPANY
+		// $clientid = "amutha@sundarammotors.com"; //PROVIDE FROM BDO COMPANY
+		$clientid = "61b27a26bd86cbb93c5c11be0c2856"; //LIVE
+
+		// dump('clientid ' . $clientid);
+
+		$rsa->loadKey($public_key);
+		$rsa->setEncryptionMode(2);
+		// $client_encryption_key = 'BBAkBDB0YzZiYThkYTg4ZDZBBDJjZBUyBGFkBBB0BWB='; // CLIENT SECRET KEY
+		// $client_encryption_key = 'TQAkSDQ0YzZiYTTkYTg4ZDZSSDJjZSUySGFkSSQ0SWQ='; // CLIENT SECRET KEY
+		$client_encryption_key = '7dd55886594bccadb03c48eb3f448e'; // LIVE
+
+		$ClientSecret = $rsa->encrypt($client_encryption_key);
+		$clientsecretencrypted = base64_encode($ClientSecret);
+		// dump('ClientSecret ' . $clientsecretencrypted);
+
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$app_secret_key = substr(str_shuffle($characters), 0, 32); // RANDOM KEY GENERATE
+		// $app_key_data = 'Rdp5EB5w756dVph0C3jCXY1K6RPC6RCD'; // RANDOM KEY GENERATE
+		// dump($app_key_data);
+		$AppSecret = $rsa->encrypt($app_secret_key);
+		$appsecretkey = base64_encode($AppSecret);
+		// dump('appsecretkey ' . $appsecretkey);
+
+		// $bdo_login_url = 'https://sandboxeinvoiceapi.bdo.in/bdoauth/bdoauthenticate';
+		$bdo_login_url = 'https://einvoiceapi.bdo.in/bdoauth/bdoauthenticate'; //LIVE
+
+		$ch = curl_init($bdo_login_url);
+		// Setup request to send json via POST`
+		$params = json_encode(array(
+			'clientid' => $clientid,
+			'clientsecretencrypted' => $clientsecretencrypted,
+			'appsecretkey' => $appsecretkey,
+		));
+
+		// Attach encoded JSON string to the POST fields
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+		// Set the content type to application/json
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+		// Return response instead of outputting
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		// Execute the POST request
+		$server_output_data = curl_exec($ch);
+
+		// Get the POST request header status
+		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		// dd($status);
+		// dd($server_output_data);
+		// If header status is not Created or not OK, return error message
+		if ($status != 200) {
+			$errors[] = 'Connection Error!';
+			return response()->json(['success' => false, 'error' => 'Connection Error!']);
+		}
+
+		curl_close($ch);
+
+		$server_output = json_decode($server_output_data);
+
+		DB::beginTransaction();
+
+		$api_log = new ApiLog;
+		$api_log->type_id = 24; //Customer
+		$api_log->entity_number = $gstin;
+		$api_log->entity_id = NULL;
+		$api_log->url = $bdo_login_url;
+		$api_log->src_data = $params;
+		$api_log->response_data = $server_output_data;
+		$api_log->user_id = Auth::user()->id;
+		$api_log->status_id = $server_output->status == 0 ? 11272 : 11271; //Failed //Success
+		$api_log->errors = $server_output->status == 0 ? $server_output->ErrorMsg : NULL;
+		$api_log->created_by_id = Auth::user()->id;
+		$api_log->save();
+
+		DB::commit();
+
+		// dd($server_output->status);
+		if ($server_output->status == 0) {
+			$errors[] = 'Something went on Server.Please Try again later!!';
+			return response()->json([
+				'success' => false,
+				'error' => $server_output->ErrorMsg,
+				'errors' => $errors,
+			]);
+		}
+
+		$expiry = $server_output->expiry;
+		$bdo_authtoken = $server_output->bdo_authtoken;
+		$status = $server_output->status;
+		$bdo_sek = $server_output->bdo_sek;
+
+		//DECRYPT WITH APP KEY AND BDO SEK KEY
+		$decrypt_data_with_bdo_sek = self::decryptAesData($app_secret_key, $bdo_sek);
+		if (!$decrypt_data_with_bdo_sek) {
+			$errors[] = 'Decryption Error!';
+			return response()->json(['success' => false, 'error' => 'Decryption Error!']);
+		}
+
+		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
+		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
+		$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
+		// dd($bdo_check_gstin_url);
+
+		$ch = curl_init($bdo_check_gstin_url);
+		// Setup request to send json via POST`
+
+		// Attach encoded JSON string to the POST fields
+		curl_setopt($ch, CURLOPT_URL, $bdo_check_gstin_url);
+
+		// Set the content type to application/json
+		$params = json_encode(array(
+			'Content-Type' => 'application/json',
+			'client_id' => $clientid,
+			'bdo_authtoken' => $bdo_authtoken,
+			// 'gstin: ' . $r->outlet_gstin,
+			'gstin' => '33AABCT0159K1ZG',
+		));
+		// dd($params);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type: application/json',
+			'client_id:' . $clientid,
+			'bdo_authtoken:' . $bdo_authtoken,
+			// 'gstin: ' . $r->outlet_gstin,
+			'gstin:33AABCT0159K1ZG',
+		));
+
+		// Return response instead of outputting
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		// Execute the POST request
+		$get_gstin_output_data = curl_exec($ch);
+
+		$get_gstin_output = json_decode($get_gstin_output_data);
+
+		DB::beginTransaction();
+
+		$api_log = new ApiLog;
+		$api_log->type_id = 24; //CUSTOMER
+		$api_log->entity_number = $gstin;
+		$api_log->entity_id = NULL;
+		$api_log->url = $bdo_check_gstin_url;
+		$api_log->src_data = $params;
+		$api_log->response_data = $get_gstin_output_data;
+		$api_log->user_id = Auth::user()->id;
+		$api_log->status_id = $get_gstin_output->Status == 0 ? 11272 : 11271; //FAILED //SUCCESS
+		$api_log->errors = $get_gstin_output->Status == 0 ? $server_output->Error : NULL;
+		$api_log->created_by_id = Auth::user()->id;
+		$api_log->save();
+
+		DB::commit();
+
+		if ($get_gstin_output->Status == 0) {
+			$errors[] = 'Something went on Server.Please Try again later!!';
+			return response()->json([
+				'success' => false,
+				'error' => $server_output->Error,
+				'errors' => $errors,
+			]);
+		}
+		curl_close($ch);
+
+		//AES DECRYPTION AFTER GENERATE IRN (DECRYPT WITH DECRYPT ENCODED DATA FROM AES DECRYPTION AND GSTIN DATA RESPONSE)
+		$gstin_decrypt_data = self::decryptAesData($decrypt_data_with_bdo_sek, $get_gstin_output->Data);
+		if (!$gstin_decrypt_data) {
+			$errors[] = 'Decryption Error!';
+			return response()->json(['success' => false, 'error' => 'Decryption Error!']);
+		}
+
+		// dump($aes_final_decoded_plain_text);
+		$aes_final_decoded_plain_text = explode(',', $gstin_decrypt_data);
+
+		$remove_open = str_replace("{", "", $aes_final_decoded_plain_text);
+		// dump($remove_open);
+		$remove_close = str_replace("}", "", $remove_open);
+		// dump($remove_close);
+		$gst_validate = [];
+		foreach ($remove_close as $key => $val) {
+			if ($val == 'irnStatus=0') {
+				DB::beginTransaction();
+
+				$api_log = new ApiLog;
+				$api_log->type_id = 24; //CUSTOMER
+				$api_log->entity_number = $gstin;
+				$api_log->entity_id = NULL;
+				$api_log->url = $bdo_check_gstin_url;
+				$api_log->src_data = $params;
+				$api_log->response_data = json_encode($aes_final_decoded_plain_text);
+				$api_log->user_id = Auth::user()->id;
+				$api_log->status_id = 11272; //FAILED //SUCCESS
+				$api_log->errors = 'Something went Wrong!';
+				$api_log->created_by_id = Auth::user()->id;
+				$api_log->save();
+
+				DB::commit();
+
+				return response()->json([
+					'success' => false,
+					'error' => 'Something went Wrong!',
+				]);
+			} elseif ($val == 'Status=0') {
+				DB::beginTransaction();
+
+				$api_log = new ApiLog;
+				$api_log->type_id = 24; //CUSTOMER
+				$api_log->entity_number = $gstin;
+				$api_log->entity_id = NULL;
+				$api_log->url = $bdo_check_gstin_url;
+				$api_log->src_data = $params;
+				$api_log->response_data = json_encode($aes_final_decoded_plain_text);
+				$api_log->user_id = Auth::user()->id;
+				$api_log->status_id = 11272; //FAILED //SUCCESS
+				$api_log->errors = 'Invalid GSTIN for this user';
+				$api_log->created_by_id = Auth::user()->id;
+				$api_log->save();
+
+				DB::commit();
+
+				return response()->json([
+					'success' => false,
+					'error' => 'Invalid GSTIN for this user!',
+				]);
+			} else {
+				DB::beginTransaction();
+
+				$api_log = new ApiLog;
+				$api_log->type_id = 24; //CUSTOMER
+				$api_log->entity_number = $gstin;
+				$api_log->entity_id = NULL;
+				$api_log->url = $bdo_check_gstin_url;
+				$api_log->src_data = $params;
+				$api_log->response_data = json_encode($aes_final_decoded_plain_text);
+				$api_log->user_id = Auth::user()->id;
+				$api_log->status_id = 11272; //FAILED //SUCCESS
+				$api_log->errors = '';
+				$api_log->created_by_id = Auth::user()->id;
+				$api_log->save();
+
+				DB::commit();
+
+				$gst_validate[$key] = $val;
+			}
+		}
+
+		$legal_name = NULL;
+		// dd($gst_validate);
+		if ($gst_validate) {
+			foreach ($gst_validate as $value) {
+				//TRADE NAME
+				if (!empty($value)) {
+					if ((strpos($value, "TradeName=") !== false)) {
+						$legal_name = explode("=", $value);
+						if ($legal_name[0] == 'TradeName') {
+							$legal_name = $legal_name[1];
+						} else {
+							$legal_name = NULL;
+						}
+					}
+				}
+				//LEGAL NAME
+				// if (!empty($value)) {
+				// 	if ((strpos($value, " LegalName=") !== false)) {
+				// 		$legal_name = explode("=", $value);
+				// 		if ($legal_name[0] == ' LegalName') {
+				// 			$legal_name = $legal_name[1];
+				// 		} else {
+				// 			$legal_name = NULL;
+				// 		}
+				// 	}
+				// }
+			}
+		} else {
+			return response()->json([
+				'success' => false,
+				'error' => 'Server went wrong. Try again later!',
+			]);
+		}
+
+		if ($legal_name) {
+			return response()->json([
+				'success' => true,
+				'trade_name' => $legal_name, //LEGAL NAME WILL BE PASSED Change on 23 OCT 2020 BECAUSE OF NEW API UT PARAMETER WON"T CHANGE
+			]);
+		} else {
+			return response()->json([
+				'success' => false,
+				'error' => 'Customer Name not found!',
+			]);
+		}
+	}
+
+	public static function decryptAesData($app_secret_key, $bdo_sek_data) {
+		$method = 'aes-256-ecb';
+
+		$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($method));
+
+		$decrypted = openssl_decrypt(base64_decode($bdo_sek_data), $method, $app_secret_key, OPENSSL_RAW_DATA, $iv);
+		return $decrypted;
+	}
 }
