@@ -19,6 +19,8 @@ class Customer extends BaseModel {
 	use SoftDeletes;
 	protected $table = 'customers';
 	public static $AUTO_GENERATE_CODE = false;
+	public static $ADDRESS_OF_ID = 24;
+	public static $PRIMARY_ADDRESS_TYPE_ID = 40;
 	public $timestamps = true;
 	public static $ADDRESS_OF_ID = 24;
 	public static $PRIMARY_ADDRESS_TYPE_ID = 40;
@@ -682,10 +684,11 @@ class Customer extends BaseModel {
 		// dd($gst_validate);
 		if ($gst_validate) {
 			foreach ($gst_validate as $value) {
+				//TRADE NAME
 				if (!empty($value)) {
-					if ((strpos($value, " LegalName=") !== false)) {
+					if ((strpos($value, "TradeName=") !== false)) {
 						$legal_name = explode("=", $value);
-						if ($legal_name[0] == ' LegalName') {
+						if ($legal_name[0] == 'TradeName') {
 							$legal_name = $legal_name[1];
 						} else {
 							$legal_name = NULL;
