@@ -4,11 +4,12 @@ namespace Abs\CustomerPkg;
 use Abs\CustomerPkg\Customer;
 use App\Address;
 use App\City;
+use App\Config;
 use App\Country;
-use App\Outlet;
 use App\CustomerDetails;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WpoSoapController;
+use App\Outlet;
 use App\State;
 use Artisaninweb\SoapWrapper\SoapWrapper;
 use Auth;
@@ -126,6 +127,7 @@ class CustomerController extends Controller {
 			$action = 'Edit';
 		}
 		$this->data['country_list'] = $country_list = Collect(Country::select('id', 'name')->get())->prepend(['id' => '', 'name' => 'Select Country']);
+		$this->data['pdf_format_list'] = Collect(Config::select('id', 'name')->where('config_type_id', 420)->get())->prepend(['id' => '', 'name' => 'Select PDF Formate']);
 		$this->data['customer'] = $customer;
 		$this->data['address'] = $address;
 		$this->data['action'] = $action;
@@ -133,12 +135,12 @@ class CustomerController extends Controller {
 
 		//Outlet by Karthick T on 23-10-2020
 		$this->data['outlet_list'] = $outlet_list = Collect(
-				Outlet::select(
-					'id',
-					'code'
-				)->where('company_id',Auth::user()->company_id)
+			Outlet::select(
+				'id',
+				'code'
+			)->where('company_id', Auth::user()->company_id)
 				->get()
-			)->prepend(['id' => '', 'code' => 'Select Outlet']);
+		)->prepend(['id' => '', 'code' => 'Select Outlet']);
 
 		return response()->json($this->data);
 	}

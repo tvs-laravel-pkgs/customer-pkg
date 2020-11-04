@@ -153,6 +153,24 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
+                                                    PDF Format
+                                                </label>
+                                                <md-select ng-model="$ctrl.customer.pdf_format_id" placeholder="Select PDF Format" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchCustomerGroup" type="search" placeholder="Search PDF Format" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="pdf.id" ng-repeat="pdf in $ctrl.pdf_format_list | filter:searchTravel">
+                                                            {{pdf.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="pdf_format_id" value='{{$ctrl.customer.pdf_format_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
                                                     Active Status
                                                     <sup class="mandatory">*</sup>
                                                 </label>

@@ -35,6 +35,7 @@ class Customer extends BaseModel {
 		'address',
 		'gst_number',
 		'pan_number',
+		'pdf_format_id',
 	];
 
 	protected static $excelColumnRules = [
@@ -681,12 +682,22 @@ class Customer extends BaseModel {
 		}
 
 		$legal_name = NULL;
-		// dd($gst_validate);
+		$error = NULL;
 		if ($gst_validate) {
 			foreach ($gst_validate as $value) {
 				//TRADE NAME
 				if (!empty($value)) {
-					if ((strpos($value, "TradeName=") !== false)) {
+					//TRADE NAME
+					// if ((strpos($value, "TradeName=") !== false)) {
+					// 	$legal_name = explode("=", $value);
+					// 	if ($legal_name[0] == 'TradeName') {
+					// 		$legal_name = $legal_name[1];
+					// 	} else {
+					// 		$legal_name = NULL;
+					// 	}
+					// }
+					// LEGAL NAME
+					if ((strpos($value, " LegalName=") !== false)) {
 						$legal_name = explode("=", $value);
 						if ($legal_name[0] == 'TradeName') {
 							$legal_name = $legal_name[1];
@@ -694,18 +705,17 @@ class Customer extends BaseModel {
 							$legal_name = NULL;
 						}
 					}
+					//ERROR MSG
+					if ((strpos($value, " ErrorMsg=") !== false)) {
+						$error = explode("=", $value);
+						if ($error[0] == ' ErrorMsg') {
+							$error = $error[1];
+						} else {
+							$error = NULL;
+						}
+					}
+
 				}
-				//LEGAL NAME
-				// if (!empty($value)) {
-				// 	if ((strpos($value, " LegalName=") !== false)) {
-				// 		$legal_name = explode("=", $value);
-				// 		if ($legal_name[0] == ' LegalName') {
-				// 			$legal_name = $legal_name[1];
-				// 		} else {
-				// 			$legal_name = NULL;
-				// 		}
-				// 	}
-				// }
 			}
 		} else {
 			return response()->json([
@@ -722,7 +732,7 @@ class Customer extends BaseModel {
 		} else {
 			return response()->json([
 				'success' => false,
-				'error' => 'Customer Name not found!',
+				'error' => $error,
 			]);
 		}
 	}
