@@ -33,6 +33,7 @@ class Customer extends BaseModel {
 		'address',
 		'gst_number',
 		'pan_number',
+		'pdf_format_id',
 	];
 
 	protected static $excelColumnRules = [

@@ -178,6 +178,7 @@ app.component('customerForm', {
             self.customer = response.data.customer;
             self.address = response.data.address;
             self.country_list = response.data.country_list;
+            self.pdf_format_list = response.data.pdf_format_list;
             self.action = response.data.action;
             self.customer_details = response.data.customer_details;
             $rootScope.loading = false;
@@ -190,6 +191,7 @@ app.component('customerForm', {
                     self.switch_value = 'Active';
                 }
             } else {
+                self.customer.pdf_format_id = 11310; // REGULAR PDF FORMAT FOR CNDN
                 self.switch_value = 'Active';
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
                 self.city_list = [{ 'id': '', 'name': 'Select City' }];
