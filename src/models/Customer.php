@@ -677,9 +677,20 @@ class Customer extends BaseModel {
 		}
 
 		$legal_name = NULL;
+		$error = NULL;
 		if ($gst_validate) {
 			foreach ($gst_validate as $value) {
 				if (!empty($value)) {
+					// //TRADE NAME
+					// if ((strpos($value, "TradeName=") !== false)) {
+					// 	$legal_name = explode("=", $value);
+					// 	if ($legal_name[0] == 'TradeName') {
+					// 		$legal_name = $legal_name[1];
+					// 	} else {
+					// 		$legal_name = NULL;
+					// 	}
+					// }
+					// LEGAL NAME
 					if ((strpos($value, " LegalName=") !== false)) {
 						$legal_name = explode("=", $value);
 						if ($legal_name[0] == ' LegalName') {
@@ -688,6 +699,16 @@ class Customer extends BaseModel {
 							$legal_name = NULL;
 						}
 					}
+					//ERROR MSG
+					if ((strpos($value, " ErrorMsg=") !== false)) {
+						$error = explode("=", $value);
+						if ($error[0] == ' ErrorMsg') {
+							$error = $error[1];
+						} else {
+							$error = NULL;
+						}
+					}
+
 				}
 			}
 		} else {
@@ -705,7 +726,7 @@ class Customer extends BaseModel {
 		} else {
 			return response()->json([
 				'success' => false,
-				'error' => 'Customer Name not found!',
+				'error' => $error,
 			]);
 		}
 	}
