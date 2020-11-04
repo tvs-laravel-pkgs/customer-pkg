@@ -19,8 +19,6 @@ class Customer extends BaseModel {
 	use SoftDeletes;
 	protected $table = 'customers';
 	public static $AUTO_GENERATE_CODE = false;
-	public static $ADDRESS_OF_ID = 24;
-	public static $PRIMARY_ADDRESS_TYPE_ID = 40;
 	public $timestamps = true;
 	public static $ADDRESS_OF_ID = 24;
 	public static $PRIMARY_ADDRESS_TYPE_ID = 40;
