@@ -494,6 +494,7 @@ class Customer extends BaseModel {
 		curl_close($ch);
 
 		$server_output = json_decode($server_output_data);
+		dump($server_output);
 
 		DB::beginTransaction();
 
@@ -681,6 +682,7 @@ class Customer extends BaseModel {
 
 		$legal_name = NULL;
 		$error = NULL;
+		// dump($gst_validate);
 		if ($gst_validate) {
 			foreach ($gst_validate as $value) {
 				//TRADE NAME
@@ -697,7 +699,7 @@ class Customer extends BaseModel {
 					// LEGAL NAME
 					if ((strpos($value, " LegalName=") !== false)) {
 						$legal_name = explode("=", $value);
-						if ($legal_name[0] == 'TradeName') {
+						if ($legal_name[0] == ' LegalName') {
 							$legal_name = $legal_name[1];
 						} else {
 							$legal_name = NULL;
