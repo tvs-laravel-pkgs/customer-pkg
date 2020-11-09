@@ -494,7 +494,6 @@ class Customer extends BaseModel {
 		curl_close($ch);
 
 		$server_output = json_decode($server_output_data);
-		dump($server_output);
 
 		DB::beginTransaction();
 
