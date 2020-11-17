@@ -680,6 +680,7 @@ class Customer extends BaseModel {
 		}
 
 		$legal_name = NULL;
+		$trade_name = NULL;
 		$error = NULL;
 		// dump($gst_validate);
 		if ($gst_validate) {
@@ -687,14 +688,14 @@ class Customer extends BaseModel {
 				//TRADE NAME
 				if (!empty($value)) {
 					//TRADE NAME
-					// if ((strpos($value, "TradeName=") !== false)) {
-					// 	$legal_name = explode("=", $value);
-					// 	if ($legal_name[0] == 'TradeName') {
-					// 		$legal_name = $legal_name[1];
-					// 	} else {
-					// 		$legal_name = NULL;
-					// 	}
-					// }
+					if ((strpos($value, "TradeName=") !== false)) {
+						$trade_name = explode("=", $value);
+						if ($trade_name[0] == 'TradeName') {
+							$trade_name = $trade_name[1];
+						} else {
+							$trade_name = NULL;
+						}
+					}
 					// LEGAL NAME
 					if ((strpos($value, " LegalName=") !== false)) {
 						$legal_name = explode("=", $value);
@@ -723,10 +724,11 @@ class Customer extends BaseModel {
 			]);
 		}
 
-		if ($legal_name) {
+		if ($legal_name || $trade_name) {
 			return response()->json([
 				'success' => true,
-				'trade_name' => $legal_name, //LEGAL NAME WILL BE PASSED Change on 23 OCT 2020 BECAUSE OF NEW API UT PARAMETER WON"T CHANGE
+				'trade_name' => $trade_name,
+				'legal_name' => $legal_name,
 			]);
 		} else {
 			return response()->json([
