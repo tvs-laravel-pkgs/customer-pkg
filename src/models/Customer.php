@@ -567,7 +567,7 @@ class Customer extends BaseModel {
 
 		// Execute the POST request
 		$get_gstin_output_data = curl_exec($ch);
-
+		// dd($get_gstin_output_data);
 		$get_gstin_output = json_decode($get_gstin_output_data);
 
 		DB::beginTransaction();
@@ -603,17 +603,91 @@ class Customer extends BaseModel {
 			$errors[] = 'Decryption Error!';
 			return response()->json(['success' => false, 'error' => 'Decryption Error!']);
 		}
-
+		// dump($gstin_decrypt_data);
+		$gst_validate = json_decode($gstin_decrypt_data, true);
+		// dd($decoded_gstin_output);
+		// dd($decoded_gstin_output);
+		// $aes_final_decoded_plain_text = explode(',', $gstin_decrypt_data);
 		// dump($aes_final_decoded_plain_text);
-		$aes_final_decoded_plain_text = explode(',', $gstin_decrypt_data);
 
-		$remove_open = str_replace("{", "", $aes_final_decoded_plain_text);
+		// $remove_open = str_replace("{", "", $aes_final_decoded_plain_text);
 		// dump($remove_open);
-		$remove_close = str_replace("}", "", $remove_open);
+		// $remove_close = str_replace("}", "", $remove_open);
 		// dump($remove_close);
-		$gst_validate = [];
-		foreach ($remove_close as $key => $val) {
-			if ($val == 'irnStatus=0') {
+		// $gst_validate = [];
+		// foreach ($decoded_gstin_output as $key => $val) {
+		// 	dd($val);
+		// 	if ($val == 'irnStatus=0') {
+		// 		DB::beginTransaction();
+
+		// 		$api_log = new ApiLog;
+		// 		$api_log->type_id = 24; //CUSTOMER
+		// 		$api_log->entity_number = $gstin;
+		// 		$api_log->entity_id = NULL;
+		// 		$api_log->url = $bdo_check_gstin_url;
+		// 		$api_log->src_data = $params;
+		// 		// $api_log->response_data = json_encode($aes_final_decoded_plain_text);
+		// 		$api_log->response_data = json_encode($gstin_decrypt_data);
+		// 		$api_log->user_id = Auth::user()->id;
+		// 		$api_log->status_id = 11272; //FAILED //SUCCESS
+		// 		$api_log->errors = 'Something went Wrong!';
+		// 		$api_log->created_by_id = Auth::user()->id;
+		// 		$api_log->save();
+
+		// 		DB::commit();
+
+		// 		return response()->json([
+		// 			'success' => false,
+		// 			'error' => 'Something went Wrong!',
+		// 		]);
+		// 	} elseif ($val == 'Status=0') {
+		// 		DB::beginTransaction();
+
+		// 		$api_log = new ApiLog;
+		// 		$api_log->type_id = 24; //CUSTOMER
+		// 		$api_log->entity_number = $gstin;
+		// 		$api_log->entity_id = NULL;
+		// 		$api_log->url = $bdo_check_gstin_url;
+		// 		$api_log->src_data = $params;
+		// 		$api_log->response_data = json_encode($gstin_decrypt_data);
+		// 		// $api_log->response_data = json_encode($aes_final_decoded_plain_text);
+		// 		$api_log->user_id = Auth::user()->id;
+		// 		$api_log->status_id = 11272; //FAILED //SUCCESS
+		// 		$api_log->errors = 'Invalid GSTIN for this user';
+		// 		$api_log->created_by_id = Auth::user()->id;
+		// 		$api_log->save();
+
+		// 		DB::commit();
+
+		// 		return response()->json([
+		// 			'success' => false,
+		// 			'error' => 'Invalid GSTIN for this user!',
+		// 		]);
+		// 	} else {
+		// 		DB::beginTransaction();
+
+		// 		$api_log = new ApiLog;
+		// 		$api_log->type_id = 24; //CUSTOMER
+		// 		$api_log->entity_number = $gstin;
+		// 		$api_log->entity_id = NULL;
+		// 		$api_log->url = $bdo_check_gstin_url;
+		// 		$api_log->src_data = $params;
+		// 		$api_log->response_data = json_encode($gstin_decrypt_data);
+		// 		// $api_log->response_data = json_encode($aes_final_decoded_plain_text);
+		// 		$api_log->user_id = Auth::user()->id;
+		// 		$api_log->status_id = 11272; //FAILED //SUCCESS
+		// 		$api_log->errors = '';
+		// 		$api_log->created_by_id = Auth::user()->id;
+		// 		$api_log->save();
+
+		// 		DB::commit();
+
+		// 		$gst_validate[$key] = $val;
+		// 	}
+		// }
+		// dd($gst_validate);
+		if (key($gst_validate) == 'irnStatus') {
+			if ($gst_validate['irnStatus'] == 0) {
 				DB::beginTransaction();
 
 				$api_log = new ApiLog;
@@ -622,7 +696,8 @@ class Customer extends BaseModel {
 				$api_log->entity_id = NULL;
 				$api_log->url = $bdo_check_gstin_url;
 				$api_log->src_data = $params;
-				$api_log->response_data = json_encode($aes_final_decoded_plain_text);
+				// $api_log->response_data = json_encode($aes_final_decoded_plain_text);
+				$api_log->response_data = json_encode($gstin_decrypt_data);
 				$api_log->user_id = Auth::user()->id;
 				$api_log->status_id = 11272; //FAILED //SUCCESS
 				$api_log->errors = 'Something went Wrong!';
@@ -635,7 +710,10 @@ class Customer extends BaseModel {
 					'success' => false,
 					'error' => 'Something went Wrong!',
 				]);
-			} elseif ($val == 'Status=0') {
+			}
+		} elseif (key($gst_validate) == 'Status') {
+			if ($gst_validate['irnStatus'] == 0) {
+
 				DB::beginTransaction();
 
 				$api_log = new ApiLog;
@@ -644,7 +722,8 @@ class Customer extends BaseModel {
 				$api_log->entity_id = NULL;
 				$api_log->url = $bdo_check_gstin_url;
 				$api_log->src_data = $params;
-				$api_log->response_data = json_encode($aes_final_decoded_plain_text);
+				$api_log->response_data = json_encode($gstin_decrypt_data);
+				// $api_log->response_data = json_encode($aes_final_decoded_plain_text);
 				$api_log->user_id = Auth::user()->id;
 				$api_log->status_id = 11272; //FAILED //SUCCESS
 				$api_log->errors = 'Invalid GSTIN for this user';
@@ -657,64 +736,95 @@ class Customer extends BaseModel {
 					'success' => false,
 					'error' => 'Invalid GSTIN for this user!',
 				]);
-			} else {
-				DB::beginTransaction();
-
-				$api_log = new ApiLog;
-				$api_log->type_id = 24; //CUSTOMER
-				$api_log->entity_number = $gstin;
-				$api_log->entity_id = NULL;
-				$api_log->url = $bdo_check_gstin_url;
-				$api_log->src_data = $params;
-				$api_log->response_data = json_encode($aes_final_decoded_plain_text);
-				$api_log->user_id = Auth::user()->id;
-				$api_log->status_id = 11272; //FAILED //SUCCESS
-				$api_log->errors = '';
-				$api_log->created_by_id = Auth::user()->id;
-				$api_log->save();
-
-				DB::commit();
-
-				$gst_validate[$key] = $val;
 			}
+		} else {
+			DB::beginTransaction();
+
+			$api_log = new ApiLog;
+			$api_log->type_id = 24; //CUSTOMER
+			$api_log->entity_number = $gstin;
+			$api_log->entity_id = NULL;
+			$api_log->url = $bdo_check_gstin_url;
+			$api_log->src_data = $params;
+			$api_log->response_data = json_encode($gstin_decrypt_data);
+			// $api_log->response_data = json_encode($aes_final_decoded_plain_text);
+			$api_log->user_id = Auth::user()->id;
+			$api_log->status_id = 11271; //FAILED //SUCCESS
+			$api_log->errors = '';
+			$api_log->created_by_id = Auth::user()->id;
+			$api_log->save();
+
+			DB::commit();
 		}
 
 		$legal_name = NULL;
 		$trade_name = NULL;
 		$error = NULL;
 		// dump($gst_validate);
-		if ($gst_validate) {
-			foreach ($gst_validate as $value) {
-				//TRADE NAME
-				if (!empty($value)) {
-					//TRADE NAME
-					if ((strpos($value, "TradeName=") !== false)) {
-						$trade_name = explode("=", $value);
-						if ($trade_name[0] == 'TradeName') {
-							$trade_name = $trade_name[1];
-						} else {
-							$trade_name = NULL;
-						}
-					}
-					// LEGAL NAME
-					if ((strpos($value, " LegalName=") !== false)) {
-						$legal_name = explode("=", $value);
-						if ($legal_name[0] == ' LegalName') {
-							$legal_name = $legal_name[1];
-						} else {
-							$legal_name = NULL;
-						}
-					}
-					//ERROR MSG
-					if ((strpos($value, " ErrorMsg=") !== false)) {
-						$error = explode("=", $value);
-						if ($error[0] == ' ErrorMsg') {
-							$error = $error[1];
-						} else {
-							$error = NULL;
-						}
-					}
+		// dd(1);
+		// if ($gst_validate) {
+		// 	foreach ($gst_validate as $value) {
+		// 		//TRADE NAME
+		// 		if (!empty($value)) {
+		// 			//TRADE NAME
+		// 			if ((strpos($value, "TradeName=") !== false)) {
+		// 				$trade_name = explode("=", $value);
+		// 				if ($trade_name[0] == 'TradeName') {
+		// 					$trade_name = $trade_name[1];
+		// 				} else {
+		// 					$trade_name = NULL;
+		// 				}
+		// 			}
+		// 			// LEGAL NAME
+		// 			if ((strpos($value, " LegalName=") !== false)) {
+		// 				$legal_name = explode("=", $value);
+		// 				if ($legal_name[0] == ' LegalName') {
+		// 					$legal_name = $legal_name[1];
+		// 				} else {
+		// 					$legal_name = NULL;
+		// 				}
+		// 			}
+		// 			//ERROR MSG
+		// 			if ((strpos($value, " ErrorMsg=") !== false)) {
+		// 				$error = explode("=", $value);
+		// 				if ($error[0] == ' ErrorMsg') {
+		// 					$error = $error[1];
+		// 				} else {
+		// 					$error = NULL;
+		// 				}
+		// 			}
 
+		// 		}
+		// 	}
+		// } else {
+		// 	return response()->json([
+		// 		'success' => false,
+		// 		'error' => 'Server went wrong. Try again later!',
+		// 	]);
+		// }
+		if ($gst_validate) {
+			// dump('in');
+			//ERROR
+			// dump($gst_validate);
+			// dump(key($gst_validate));
+			if (key($gst_validate) == 'ErrorCodes') {
+				if ($gst_validate['ErrorMsg']) {
+					$error = $gst_validate['ErrorMsg'];
+				} else {
+					$error = NULL;
+				}
+			} else {
+				//TRADE NAME
+				if ($gst_validate['TradeName']) {
+					$trade_name = $gst_validate['TradeName'];
+				} else {
+					$trade_name = NULL;
+				}
+				// LEGAL NAME
+				if ($gst_validate['LegalName']) {
+					$legal_name = $gst_validate['LegalName'];
+				} else {
+					$legal_name = NULL;
 				}
 			}
 		} else {
@@ -724,6 +834,7 @@ class Customer extends BaseModel {
 			]);
 		}
 
+		// dd($trade_name, $legal_name, $error);
 		if ($legal_name || $trade_name) {
 			return response()->json([
 				'success' => true,
