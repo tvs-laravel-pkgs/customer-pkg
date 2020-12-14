@@ -221,6 +221,8 @@ class CustomerController extends Controller {
 			$customer->axapta_location_id = $request->axapta_location_id;
 			//Outlet by Karthick T on 23-10-2020
 			$customer->outlet_id = $request->outlet_id;
+			//Customer cash limit by Karthick T on 14-12-2020
+			$customer->cash_limit_status = (isset($request->customer_limit_allow) && $request->customer_limit_allow) ? $request->customer_limit_allow : 0;
 			$customer->save();
 
 			if (!$address) {

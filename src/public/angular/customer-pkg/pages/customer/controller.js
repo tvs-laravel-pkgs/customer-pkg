@@ -195,6 +195,8 @@ app.component('customerForm', {
                 self.switch_value = 'Active';
                 self.state_list = [{ 'id': '', 'name': 'Select State' }];
                 self.city_list = [{ 'id': '', 'name': 'Select City' }];
+                //Customer cash limit by Karthick T on 14-12-2020
+                self.customer.cash_limit_status = 1;
             }
             //Outlet by Karthick T on 23-10-2020
             self.outlet_list = response.data.outlet_list;

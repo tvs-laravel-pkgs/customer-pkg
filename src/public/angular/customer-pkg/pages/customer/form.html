@@ -168,6 +168,19 @@
                                                 <input type="hidden" name="pdf_format_id" value='{{$ctrl.customer.pdf_format_id}}'>
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
+                                        <!-- Customer cash limit by Karthick T on 14-12-2020 -->
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Customer Limit Allow</label>
+                                                <div class="common-radio-button">
+                                                    <input type="radio" id="radio_yes" name="customer_limit_allow" value="1" ng-value="1" value="1" ng-model="$ctrl.customer.cash_limit_status" ng-checked="$ctrl.customer.cash_limit_status" />
+                                                    <label for="radio_yes">Yes</label>
+                                                    <input type="radio" id="radio_no" name="customer_limit_allow" value="0" ng-value="0" value="0" ng-model="$ctrl.customer.cash_limit_status" ng-checked="$ctrl.customer.cash_limit_status" />
+                                                    <label for="radio_no">No</label>
+                                                </div>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <!-- Customer cash limit by Karthick T on 14-12-2020 -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
