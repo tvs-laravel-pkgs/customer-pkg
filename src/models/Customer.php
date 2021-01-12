@@ -8,6 +8,7 @@ use App\ApiLog;
 use App\BaseModel;
 use App\Company;
 use App\Outlet;
+use App\Receipt;
 use Auth;
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -260,6 +261,11 @@ class Customer extends BaseModel {
 		return $this->hasOne('App\Address', 'entity_id')->where('address_of_id', static::$ADDRESS_OF_ID)->where('address_type_id', static::$PRIMARY_ADDRESS_TYPE_ID)
 		;
 	}
+
+	public function receipt()
+    {
+        return $this->morphMany(Receipt::class, 'receiptable');
+    }
 
 	public static function relationships($action = '') {
 		if ($action == 'options') {
