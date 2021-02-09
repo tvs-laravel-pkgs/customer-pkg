@@ -11,12 +11,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\WpoSoapController;
 use App\Outlet;
 use App\State;
+use Abs\CustomerPkg\CustomerDimension;
 use Artisaninweb\SoapWrapper\SoapWrapper;
 use Auth;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Validator;
+use Entrust;
 use Yajra\Datatables\Datatables;
 
 class CustomerController extends Controller {
@@ -46,7 +48,7 @@ class CustomerController extends Controller {
 				DB::raw('IF(customers.email IS NULL,"--",customers.email) as email'),
 				DB::raw('IF(customers.deleted_at IS NULL,"Active","Inactive") as status')
 			)
-			->where('customers.company_id', Auth::user()->company_id)
+			// ->where('customers.company_id', Auth::user()->company_id)
 			->where(function ($query) use ($request) {
 				if (!empty($request->customer_code)) {
 					$query->where('customers.code', 'LIKE', '%' . $request->customer_code . '%');
@@ -84,6 +86,10 @@ class CustomerController extends Controller {
 				})
 			;
 		}
+		//List All customer by Karthick T on 09-02-2021
+		if (!Entrust::can('view-all-customers'))
+			$customers = $customers->where('customers.company_id', Auth::user()->company_id);
+		//List All customer by Karthick T on 09-02-2021
 
 		return Datatables::of($customers)
 			->addColumn('code', function ($customer) {
@@ -125,6 +131,11 @@ class CustomerController extends Controller {
 				$customer_details = new CustomerDetails;
 			}
 			$action = 'Edit';
+			//Dimension id by Karthick T on 08-02-2021
+			$dimension= CustomerDimension::where('customer_id',$id)
+				->where('company_id',Auth::user()->company_id)
+				->pluck('dimension')->first();
+			$customer->dimension = $dimension;
 		}
 		$this->data['country_list'] = $country_list = Collect(Country::select('id', 'name')->get())->prepend(['id' => '', 'name' => 'Select Country']);
 		$this->data['pdf_format_list'] = Collect(Config::select('id', 'name')->where('config_type_id', 420)->get())->prepend(['id' => '', 'name' => 'Select PDF Formate']);
@@ -244,6 +255,22 @@ class CustomerController extends Controller {
 			$customer_details->customer_id = $customer->id;
 			$customer_details->save();
 
+			//Store Customer Dimension By Karthick T on 08-02-2021
+			if(isset($request->dimension) && $request->dimension){
+				$customer_dimension = CustomerDimension::firstOrNew([
+					'customer_id' => $customer->id,
+					'company_id' => Auth::user()->company_id,
+				]);
+				$customer_dimension->dimension = $request->dimension;
+				$customer_dimension->created_by_id = Auth::user()->id;
+				$customer_dimension->updated_by_id = Auth::user()->id;
+				$customer_dimension->save();
+			}else{
+				$customer_dimension = CustomerDimension::where('customer_id',$customer->id)
+					->where('company_id', Auth::user()->company_id)
+					->forcedelete();
+			}
+			//Store Customer Dimension By Karthick T on 08-02-2021
 			DB::commit();
 			if (!($request->id)) {
 				return response()->json(['success' => true, 'message' => ['Customer Details Added Successfully']]);
