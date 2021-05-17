@@ -120,9 +120,9 @@ class CustomerController extends Controller {
 			$action = 'Add';
 		} else {
 			$customer = Customer::withTrashed()->find($id);
-			$address = Address::where('address_of_id', 24)->where('entity_id', $id)->first();
+			$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $id)->first();
 			//Add Pan && Aadhar to Customer details by Karthik Kumar on 19-02-2020
-			$customer_details = CustomerDetails::where('customer_id', $id)->first();
+			$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $id)->first();
 			if (!$address) {
 				$address = new Address;
 			}
@@ -215,9 +215,10 @@ class CustomerController extends Controller {
 				$customer->updated_at = Carbon::now();
 				$customer->credit_limits = $request->credit_limits;
 				$customer->credit_days = $request->credit_days;
-				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				// dd($address);
 				//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
-				$customer_details = CustomerDetails::where('customer_id', $request->id)->first();
+				$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $request->id)->first();
 			}
 			$customer->fill($request->all());
 			$customer->company_id = Auth::user()->company_id;
