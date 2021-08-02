@@ -200,6 +200,8 @@ app.component('customerForm', {
             }
             //Outlet by Karthick T on 23-10-2020
             self.outlet_list = response.data.outlet_list;
+            //IMS type BY PARTHIBAN V ON 29-07-2021
+            self.ims_type_list=response.data.ims_type_list;
         });
 
         /* Tab Funtion */

@@ -181,6 +181,24 @@
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <!-- Customer cash limit by Karthick T on 14-12-2020 -->
+                                        <!-- Customer IMS Type by Parthiban V on 29-07-2021 -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>IMS Type</label>
+                                                <md-select ng-model="$ctrl.customer.ims_type_id" placeholder="Select IMS Type" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header">
+                                                        <input ng-model="searchCustomerImsType" type="search" placeholder="Search IMS Type" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="ims_type.id" ng-repeat="ims_type in $ctrl.ims_type_list | filter:searchCustomerImsType">
+                                                            {{ims_type.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="ims_type_id" value='{{$ctrl.customer.ims_type_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <!-- Customer IMS Type by Parthiban V on 29-07-2021 -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>

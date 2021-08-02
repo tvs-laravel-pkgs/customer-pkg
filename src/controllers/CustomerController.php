@@ -152,6 +152,8 @@ class CustomerController extends Controller {
 			)->where('company_id', Auth::user()->company_id)
 				->get()
 		)->prepend(['id' => '', 'code' => 'Select Outlet']);
+        //IMS Type by Parthiban V on 29-07-2021
+        $this->data['ims_type_list'] =  Collect(Config::select('id', 'name')->where('config_type_id', 254)->get())->prepend(['id' => '', 'name' => 'Select IMS Type']);
 
 		return response()->json($this->data);
 	}
@@ -235,6 +237,8 @@ class CustomerController extends Controller {
 			$customer->outlet_id = $request->outlet_id;
 			//Customer cash limit by Karthick T on 14-12-2020
 			$customer->cash_limit_status = (isset($request->customer_limit_allow) && $request->customer_limit_allow) ? $request->customer_limit_allow : 0;
+            //IMS Type By Parthiban V on 29-07-2021
+            $customer->ims_type_id = (isset($request->ims_type_id) && $request->ims_type_id) ? $request->ims_type_id : null;
 			$customer->save();
 
 			if (!$address) {
