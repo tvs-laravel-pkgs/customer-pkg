@@ -109,19 +109,96 @@
                                             </div><!-- Field -->
                                         </div><!-- Column -->
                                         <!--Add Aadhar and PAN no to customer by Karthik kumar on 19-02-2020 -->
-                                         <div class="col-md-3">
+                                        <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>Aadhar Number</label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.customer_details.aadhar_no" name="aadhar_no" placeholder="Enter Aadhar Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
-                                         <div class="col-md-3">
+                                        <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>PAN Number</label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.customer_details.pan_no" name="pan_no" placeholder="Enter PAN Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>Credit Limit</label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.credit_limits" name="credit_limits" placeholder="Enter Credit Amount" />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>Credit Days</label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.credit_days" name="credit_days" placeholder="Enter Credit Days" />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
                                         <!-- END -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>Outlet</label>
+                                                <md-select ng-model="$ctrl.customer.outlet_id" placeholder="Select Outlet" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header">
+                                                        <input ng-model="searchCustomerOutlet" type="search" placeholder="Search Outlet" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="outlet.id" ng-repeat="outlet in $ctrl.outlet_list | filter:searchCustomerOutlet">
+                                                            {{outlet.code}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="outlet_id" value='{{$ctrl.customer.outlet_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    PDF Format
+                                                </label>
+                                                <md-select ng-model="$ctrl.customer.pdf_format_id" placeholder="Select PDF Format" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchCustomerGroup" type="search" placeholder="Search PDF Format" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="pdf.id" ng-repeat="pdf in $ctrl.pdf_format_list | filter:searchTravel">
+                                                            {{pdf.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="pdf_format_id" value='{{$ctrl.customer.pdf_format_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <!-- Customer cash limit by Karthick T on 14-12-2020 -->
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Customer Limit Allow</label>
+                                                <div class="common-radio-button">
+                                                    <input type="radio" id="radio_yes" name="customer_limit_allow" value="1" ng-value="1" value="1" ng-model="$ctrl.customer.cash_limit_status" ng-checked="$ctrl.customer.cash_limit_status" />
+                                                    <label for="radio_yes">Yes</label>
+                                                    <input type="radio" id="radio_no" name="customer_limit_allow" value="0" ng-value="0" value="0" ng-model="$ctrl.customer.cash_limit_status" ng-checked="$ctrl.customer.cash_limit_status" />
+                                                    <label for="radio_no">No</label>
+                                                </div>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <!-- Customer cash limit by Karthick T on 14-12-2020 -->
+                                        <!-- Customer IMS Type by Parthiban V on 29-07-2021 -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>IMS Type</label>
+                                                <md-select ng-model="$ctrl.customer.ims_type_id" placeholder="Select IMS Type" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header">
+                                                        <input ng-model="searchCustomerImsType" type="search" placeholder="Search IMS Type" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="ims_type.id" ng-repeat="ims_type in $ctrl.ims_type_list | filter:searchCustomerImsType">
+                                                            {{ims_type.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="ims_type_id" value='{{$ctrl.customer.ims_type_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <!-- Customer IMS Type by Parthiban V on 29-07-2021 -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
