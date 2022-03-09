@@ -435,71 +435,76 @@ class Customer extends BaseModel {
 				'error' => 'GSTIN is Empty!',
 			]);
 		}
-		$rsa = new Crypt_RSA;
-		$encrypter = app('Illuminate\Contracts\Encryption\Encrypter');
+		// $rsa = new Crypt_RSA;
+		// $encrypter = app('Illuminate\Contracts\Encryption\Encrypter');
 
-		$public_key = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxqHazGS4OkY/bDp0oklL+Ser7EpTpxyeMop8kfBlhzc8dzWryuAECwu8i/avzL4f5XG/DdSgMz7EdZCMrcxtmGJlMo2tUqjVlIsUslMG6Cmn46w0u+pSiM9McqIvJgnntKDHg90EIWg1BNnZkJy1NcDrB4O4ea66Y6WGNdb0DxciaYRlToohv8q72YLEII/z7W/7EyDYEaoSlgYs4BUP69LF7SANDZ8ZuTpQQKGF4TJKNhJ+ocmJ8ahb2HTwH3Ol0THF+0gJmaigs8wcpWFOE2K+KxWfyX6bPBpjTzC+wQChCnGQREhaKdzawE/aRVEVnvWc43dhm0janHp29mAAVv+ngYP9tKeFMjVqbr8YuoT2InHWFKhpPN8wsk30YxyDvWkN3mUgj3Q/IUhiDh6fU8GBZ+iIoxiUfrKvC/XzXVsCE2JlGVceuZR8OzwGrxk+dvMnVHyauN1YWnJuUTYTrCw3rgpNOyTWWmlw2z5dDMpoHlY0WmTVh0CrMeQdP33D3LGsa+7JYRyoRBhUTHepxLwk8UiLbu6bGO1sQwstLTTmk+Z9ZSk9EUK03Bkgv0hOmSPKC4MLD5rOM/oaP0LLzZ49jm9yXIrgbEcn7rv82hk8ghqTfChmQV/q+94qijf+rM2XJ7QX6XBES0UvnWnV6bVjSoLuBi9TF1ttLpiT3fkCAwEAAQ=='; //PROVIDE FROM BDO COMPANY
+		// $public_key = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxqHazGS4OkY/bDp0oklL+Ser7EpTpxyeMop8kfBlhzc8dzWryuAECwu8i/avzL4f5XG/DdSgMz7EdZCMrcxtmGJlMo2tUqjVlIsUslMG6Cmn46w0u+pSiM9McqIvJgnntKDHg90EIWg1BNnZkJy1NcDrB4O4ea66Y6WGNdb0DxciaYRlToohv8q72YLEII/z7W/7EyDYEaoSlgYs4BUP69LF7SANDZ8ZuTpQQKGF4TJKNhJ+ocmJ8ahb2HTwH3Ol0THF+0gJmaigs8wcpWFOE2K+KxWfyX6bPBpjTzC+wQChCnGQREhaKdzawE/aRVEVnvWc43dhm0janHp29mAAVv+ngYP9tKeFMjVqbr8YuoT2InHWFKhpPN8wsk30YxyDvWkN3mUgj3Q/IUhiDh6fU8GBZ+iIoxiUfrKvC/XzXVsCE2JlGVceuZR8OzwGrxk+dvMnVHyauN1YWnJuUTYTrCw3rgpNOyTWWmlw2z5dDMpoHlY0WmTVh0CrMeQdP33D3LGsa+7JYRyoRBhUTHepxLwk8UiLbu6bGO1sQwstLTTmk+Z9ZSk9EUK03Bkgv0hOmSPKC4MLD5rOM/oaP0LLzZ49jm9yXIrgbEcn7rv82hk8ghqTfChmQV/q+94qijf+rM2XJ7QX6XBES0UvnWnV6bVjSoLuBi9TF1ttLpiT3fkCAwEAAQ=='; //PROVIDE FROM BDO COMPANY
 
-		// $clientid = "prakashr@featsolutions.in"; //PROVIDE FROM BDO COMPANY
-		// $clientid = "amutha@sundarammotors.com"; //PROVIDE FROM BDO COMPANY
+		// // $clientid = "prakashr@featsolutions.in"; //PROVIDE FROM BDO COMPANY
+		// // $clientid = "amutha@sundarammotors.com"; //PROVIDE FROM BDO COMPANY
+		// $clientid = "61b27a26bd86cbb93c5c11be0c2856"; //LIVE
+
+		// // dump('clientid ' . $clientid);
+
+		// $rsa->loadKey($public_key);
+		// $rsa->setEncryptionMode(2);
+		// // $client_encryption_key = 'BBAkBDB0YzZiYThkYTg4ZDZBBDJjZBUyBGFkBBB0BWB='; // CLIENT SECRET KEY
+		// // $client_encryption_key = 'TQAkSDQ0YzZiYTTkYTg4ZDZSSDJjZSUySGFkSSQ0SWQ='; // CLIENT SECRET KEY
+		// $client_encryption_key = '7dd55886594bccadb03c48eb3f448e'; // LIVE
+
+		// $ClientSecret = $rsa->encrypt($client_encryption_key);
+		// $clientsecretencrypted = base64_encode($ClientSecret);
+		// // dump('ClientSecret ' . $clientsecretencrypted);
+
+		// $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		// $app_secret_key = substr(str_shuffle($characters), 0, 32); // RANDOM KEY GENERATE
+		// // $app_key_data = 'Rdp5EB5w756dVph0C3jCXY1K6RPC6RCD'; // RANDOM KEY GENERATE
+		// // dump($app_key_data);
+		// $AppSecret = $rsa->encrypt($app_secret_key);
+		// $appsecretkey = base64_encode($AppSecret);
+		// // dump('appsecretkey ' . $appsecretkey);
+
+		// // $bdo_login_url = 'https://sandboxeinvoiceapi.bdo.in/bdoauth/bdoauthenticate';
+		// $bdo_login_url = 'https://einvoiceapi.bdo.in/bdoauth/bdoauthenticate'; //LIVE
+
+		// $ch = curl_init($bdo_login_url);
+		// // Setup request to send json via POST`
+		// $params = json_encode(array(
+		// 	'clientid' => $clientid,
+		// 	'clientsecretencrypted' => $clientsecretencrypted,
+		// 	'appsecretkey' => $appsecretkey,
+		// ));
+
+		// // Attach encoded JSON string to the POST fields
+		// curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+		// // Set the content type to application/json
+		// curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+		// // Return response instead of outputting
+		// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		// // Execute the POST request
+		// $server_output_data = curl_exec($ch);
+
+		// // Get the POST request header status
+		// $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		// // dd($status);
+		// // dd($server_output_data);
+		// // If header status is not Created or not OK, return error message
+		// if ($status != 200) {
+		// 	$errors[] = 'Connection Error!';
+		// 	return response()->json(['success' => false, 'error' => 'Connection Error!']);
+		// }
+
+		// curl_close($ch);
+
+		// $server_output = json_decode($server_output_data);
+
 		$clientid = "61b27a26bd86cbb93c5c11be0c2856"; //LIVE
-
-		// dump('clientid ' . $clientid);
-
-		$rsa->loadKey($public_key);
-		$rsa->setEncryptionMode(2);
-		// $client_encryption_key = 'BBAkBDB0YzZiYThkYTg4ZDZBBDJjZBUyBGFkBBB0BWB='; // CLIENT SECRET KEY
-		// $client_encryption_key = 'TQAkSDQ0YzZiYTTkYTg4ZDZSSDJjZSUySGFkSSQ0SWQ='; // CLIENT SECRET KEY
-		$client_encryption_key = '7dd55886594bccadb03c48eb3f448e'; // LIVE
-
-		$ClientSecret = $rsa->encrypt($client_encryption_key);
-		$clientsecretencrypted = base64_encode($ClientSecret);
-		// dump('ClientSecret ' . $clientsecretencrypted);
-
-		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$app_secret_key = substr(str_shuffle($characters), 0, 32); // RANDOM KEY GENERATE
-		// $app_key_data = 'Rdp5EB5w756dVph0C3jCXY1K6RPC6RCD'; // RANDOM KEY GENERATE
-		// dump($app_key_data);
-		$AppSecret = $rsa->encrypt($app_secret_key);
-		$appsecretkey = base64_encode($AppSecret);
-		// dump('appsecretkey ' . $appsecretkey);
-
-		// $bdo_login_url = 'https://sandboxeinvoiceapi.bdo.in/bdoauth/bdoauthenticate';
-		$bdo_login_url = 'https://einvoiceapi.bdo.in/bdoauth/bdoauthenticate'; //LIVE
-
-		$ch = curl_init($bdo_login_url);
-		// Setup request to send json via POST`
-		$params = json_encode(array(
-			'clientid' => $clientid,
-			'clientsecretencrypted' => $clientsecretencrypted,
-			'appsecretkey' => $appsecretkey,
-		));
-
-		// Attach encoded JSON string to the POST fields
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-
-		// Set the content type to application/json
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-
-		// Return response instead of outputting
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-		// Execute the POST request
-		$server_output_data = curl_exec($ch);
-
-		// Get the POST request header status
-		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		// dd($status);
-		// dd($server_output_data);
-		// If header status is not Created or not OK, return error message
-		if ($status != 200) {
-			$errors[] = 'Connection Error!';
-			return response()->json(['success' => false, 'error' => 'Connection Error!']);
-		}
-
-		curl_close($ch);
-
-		$server_output = json_decode($server_output_data);
+		$authToken = getBdoAuthToken(Auth::user()->company_id);
+		$params = isset($authToken["params"])?$authToken["params"]:json_encode([]);
+		$server_output_data = isset($authToken["server_output"])?$authToken["server_output"]:json_encode([]);
 
 		DB::beginTransaction();
 
@@ -507,38 +512,39 @@ class Customer extends BaseModel {
 		$api_log->type_id = 24; //Customer
 		$api_log->entity_number = $gstin;
 		$api_log->entity_id = NULL;
-		$api_log->url = $bdo_login_url;
+		$api_log->url = $authToken["url"];
 		$api_log->src_data = $params;
 		$api_log->response_data = $server_output_data;
 		$api_log->user_id = Auth::user()->id;
-		$api_log->status_id = $server_output->status == 0 ? 11272 : 11271; //Failed //Success
-		$api_log->errors = $server_output->status == 0 ? $server_output->ErrorMsg : NULL;
+		$api_log->status_id = (!$authToken["success"]) ? 11272 : 11271; //Failed //Success
+		$api_log->errors = (!$authToken["success"] && !empty($authToken['errors'])) ? json_encode($authToken['errors']) : NULL;
 		$api_log->created_by_id = Auth::user()->id;
 		$api_log->save();
 
 		DB::commit();
 
 		// dd($server_output->status);
-		if ($server_output->status == 0) {
-			$errors[] = 'Something went on Server.Please Try again later!!';
+		if (!$authToken["success"]) {
+			$errors[] = 'BDO Login Failed. Please Try again later!!';
 			return response()->json([
 				'success' => false,
-				'error' => $server_output->ErrorMsg,
+				'error' => $authToken['errors'],
 				'errors' => $errors,
+				'api_log'=>$api_log
 			]);
 		}
 
-		$expiry = $server_output->expiry;
-		$bdo_authtoken = $server_output->bdo_authtoken;
-		$status = $server_output->status;
-		$bdo_sek = $server_output->bdo_sek;
+		$app_secret_key = $authToken["result"]["app_secret"];
+        $expiry = $authToken["result"]["expiry_date"];
+        $bdo_authtoken = $authToken["result"]["bdo_authtoken"];
+        $status = $authToken["result"]["status"];
+        //DECRYPTED BDO SEK KEY
+        $decrypt_data_with_bdo_sek = $authToken["result"]["bdo_secret"];
 
-		//DECRYPT WITH APP KEY AND BDO SEK KEY
-		$decrypt_data_with_bdo_sek = self::decryptAesData($app_secret_key, $bdo_sek);
-		if (!$decrypt_data_with_bdo_sek) {
-			$errors[] = 'Decryption Error!';
-			return response()->json(['success' => false, 'error' => 'Decryption Error!']);
-		}
+		// if (!$decrypt_data_with_bdo_sek) {
+		// 	$errors[] = 'Decryption Error!';
+		// 	return response()->json(['success' => false, 'error' => 'Decryption Error!']);
+		// }
 
 		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
 		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
@@ -575,6 +581,17 @@ class Customer extends BaseModel {
 		$get_gstin_output_data = curl_exec($ch);
 		// dd($get_gstin_output_data);
 		$get_gstin_output = json_decode($get_gstin_output_data);
+		if($get_gstin_output_data == 'GSP AUTHTOKEN IS NOT VALID'){
+			DB::table('bdo_auth_tokens')->where([
+				'bdo_secret'=>$decrypt_data_with_bdo_sek,
+				'app_secret'=>$app_secret_key])
+			->update(['status'=>'0']);
+			return [
+                'success' => false,
+                'error' => "GSP AUTHTOKEN IS NOT VALID, TRY AGAIN",
+                'errors' => []
+            ];
+		}
 
 		DB::beginTransaction();
 
