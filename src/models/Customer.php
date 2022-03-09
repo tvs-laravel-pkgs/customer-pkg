@@ -501,7 +501,8 @@ class Customer extends BaseModel {
 
 		// $server_output = json_decode($server_output_data);
 
-		$clientid = "61b27a26bd86cbb93c5c11be0c2856"; //LIVE
+		// $clientid = "61b27a26bd86cbb93c5c11be0c2856"; //LIVE
+		$clientid = config('custom.CLIENT_ID');
 		$authToken = getBdoAuthToken(Auth::user()->company_id);
 		$params = isset($authToken["params"])?$authToken["params"]:json_encode([]);
 		$server_output_data = isset($authToken["server_output"])?$authToken["server_output"]:json_encode([]);
@@ -548,7 +549,12 @@ class Customer extends BaseModel {
 
 		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
 		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
-		$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
+		if($clientid == '61b27a26bd86cbb93c5c11be0c2856'){
+			$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
+		}
+		else{
+			$bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
+		}
 		// dd($bdo_check_gstin_url);
 
 		$ch = curl_init($bdo_check_gstin_url);
