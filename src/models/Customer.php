@@ -505,7 +505,7 @@ class Customer extends BaseModel {
 		$clientid = config('custom.CLIENT_ID');
 		$authToken = getBdoAuthToken(Auth::user()->company_id);
 		$params = isset($authToken["params"])?$authToken["params"]:json_encode([]);
-		$server_output_data = isset($authToken["server_output"])?$authToken["server_output"]:json_encode([]);
+		$server_output_data = isset($authToken["server_output"])?json_decode($authToken["server_output"]):json_encode([]);
 
 		DB::beginTransaction();
 
@@ -515,7 +515,7 @@ class Customer extends BaseModel {
 		$api_log->entity_id = NULL;
 		$api_log->url = $authToken["url"];
 		$api_log->src_data = $params;
-		$api_log->response_data = $server_output_data;
+		$api_log->response_data = json_encode($server_output_data);
 		$api_log->user_id = Auth::user()->id;
 		$api_log->status_id = (!$authToken["success"]) ? 11272 : 11271; //Failed //Success
 		$api_log->errors = (!$authToken["success"] && !empty($authToken['errors'])) ? json_encode($authToken['errors']) : NULL;
@@ -524,7 +524,7 @@ class Customer extends BaseModel {
 
 		DB::commit();
 
-		// dd($server_output->status);
+		// dd($server_output_data->status);
 		if (!$authToken["success"]) {
 			$errors[] = 'BDO Login Failed. Please Try again later!!';
 			return response()->json([
@@ -569,7 +569,8 @@ class Customer extends BaseModel {
 			'client_id' => $clientid,
 			'bdo_authtoken' => $bdo_authtoken,
 			// 'gstin: ' . $r->outlet_gstin,
-			'gstin' => '33AABCT0159K1ZG',
+			// 'gstin' => '33AABCT0159K1ZG',
+			'gstin' => '33AAGCT6376B1ZF',
 		));
 		// dd($params);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -577,7 +578,8 @@ class Customer extends BaseModel {
 			'client_id:' . $clientid,
 			'bdo_authtoken:' . $bdo_authtoken,
 			// 'gstin: ' . $r->outlet_gstin,
-			'gstin:33AABCT0159K1ZG',
+			// 'gstin:33AABCT0159K1ZG',
+			'gstin:33AAGCT6376B1ZF',
 		));
 
 		// Return response instead of outputting
@@ -610,7 +612,7 @@ class Customer extends BaseModel {
 		$api_log->response_data = $get_gstin_output_data;
 		$api_log->user_id = Auth::user()->id;
 		$api_log->status_id = $get_gstin_output->Status == 0 ? 11272 : 11271; //FAILED //SUCCESS
-		$api_log->errors = $get_gstin_output->Status == 0 ? $server_output->Error : NULL;
+		$api_log->errors = $get_gstin_output->Status == 0 ? $get_gstin_output->Error : NULL;
 		$api_log->created_by_id = Auth::user()->id;
 		$api_log->save();
 
@@ -620,7 +622,7 @@ class Customer extends BaseModel {
 			$errors[] = 'Something went on Server.Please Try again later!!';
 			return response()->json([
 				'success' => false,
-				'error' => $server_output->Error,
+				'error' => $get_gstin_output->Error,
 				'errors' => $errors,
 			]);
 		}
