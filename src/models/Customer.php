@@ -570,8 +570,8 @@ class Customer extends BaseModel {
 			'client_id' => $clientid,
 			'bdo_authtoken' => $bdo_authtoken,
 			// 'gstin: ' . $r->outlet_gstin,
-			// 'gstin' => '33AABCT0159K1ZG',
-			'gstin' => '33AAGCT6376B1ZF',
+			'gstin' => '33AABCT0159K1ZG',
+			// 'gstin' => '33AAGCT6376B1ZF',
 		));
 		// dd($params);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -579,8 +579,8 @@ class Customer extends BaseModel {
 			'client_id:' . $clientid,
 			'bdo_authtoken:' . $bdo_authtoken,
 			// 'gstin: ' . $r->outlet_gstin,
-			// 'gstin:33AABCT0159K1ZG',
-			'gstin:33AAGCT6376B1ZF',
+			'gstin:33AABCT0159K1ZG',
+			// 'gstin:33AAGCT6376B1ZF',
 		));
 
 		// Return response instead of outputting
