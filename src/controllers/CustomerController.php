@@ -11,11 +11,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\WpoSoapController;
 use App\Outlet;
 use App\State;
+use App\Attachment;
 use Abs\CustomerPkg\CustomerDimension;
 use Artisaninweb\SoapWrapper\SoapWrapper;
 use Auth;
 use Carbon\Carbon;
 use DB;
+use Storage;
+use URL;
 use Illuminate\Http\Request;
 use Validator;
 use Entrust;
@@ -48,7 +51,7 @@ class CustomerController extends Controller {
 				DB::raw('IF(customers.email IS NULL,"--",customers.email) as email'),
 				DB::raw('IF(customers.deleted_at IS NULL,"Active","Inactive") as status')
 			)
-			// ->where('customers.company_id', Auth::user()->company_id)
+			->where('customers.company_id', Auth::user()->company_id)
 			->where(function ($query) use ($request) {
 				if (!empty($request->customer_code)) {
 					$query->where('customers.code', 'LIKE', '%' . $request->customer_code . '%');
@@ -120,7 +123,7 @@ class CustomerController extends Controller {
 			$action = 'Add';
 		} else {
 			$customer = Customer::withTrashed()->find($id);
-			$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $id)->first();
+			$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'address_line3', 'landmark', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $id)->first();
 			//Add Pan && Aadhar to Customer details by Karthik Kumar on 19-02-2020
 			$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $id)->first();
 			if (!$address) {
@@ -155,11 +158,21 @@ class CustomerController extends Controller {
         //IMS Type by Parthiban V on 29-07-2021
         $this->data['ims_type_list'] =  Collect(Config::select('id', 'name')->where('config_type_id', 254)->get())->prepend(['id' => '', 'name' => 'Select IMS Type']);
 
+		//Customer details upload type by Rajarajan S on 18-04-2022
+		$this->data['customer_upload_types'] = Collect(Config::select('id', 'name')->where('config_type_id', 13)
+		->whereIn('id',[129238,129237,129236])->get())->prepend(['id' => '', 'name' => 'Select Upload Type']);
+		$this->data['attachments'] = Attachment::select('id', 'entity_id', 'attachment_of_id', 'attachment_type_id', 'name')
+			->whereIn('attachment_of_id', [129238,129237,129236])->get();
+
+		$this->data['view'] = URL::asset('public/theme/img/table/view.svg');
+		$this->data['delete'] = URL::asset('public/theme/img/table/delete.svg');
+		//Customer details upload type by Rajarajan S on 18-04-2022
+
 		return response()->json($this->data);
 	}
 
 	public function saveCustomer(Request $request) {
-
+		// dd($request->all());
 		try {
 			$error_messages = [
 				'code.required' => 'Customer Code is Required',
@@ -171,12 +184,16 @@ class CustomerController extends Controller {
 				'name.min' => 'Minimum 3 Characters',
 				'gst_number.required' => 'GST Number is Required',
 				'gst_number.max' => 'Maximum 191 Numbers',
-				'mobile_no.max' => 'Maximum 25 Numbers',
+				'mobile_no.max' => 'Maximum 10 Numbers',
 				// 'email.required' => 'Email is Required',
 				'address_line1.required' => 'Address Line 1 is Required',
 				'address_line1.max' => 'Maximum 255 Characters',
 				'address_line1.min' => 'Minimum 3 Characters',
 				'address_line2.max' => 'Maximum 255 Characters',
+				'address_line3.max' => 'Maximum 255 Characters',
+				'shipping_address.required' => 'Shipping Address is Required',
+				'aadhar_no.required' => 'Aadhar Number is Required',
+				'pan_no.required' => 'Pan Number is Required',
 				// 'pincode.required' => 'Pincode is Required',
 				// 'pincode.max' => 'Maximum 6 Characters',
 				// 'pincode.min' => 'Minimum 6 Characters',
@@ -190,17 +207,20 @@ class CustomerController extends Controller {
 				],
 				'name' => 'required|max:255|min:3',
 				'gst_number' => 'nullable|max:191',
-				'mobile_no' => 'nullable|max:25',
+				'mobile_no' => 'nullable|max:10',
 				// 'email' => 'nullable',
-				'address' => 'required',
+				// 'address' => 'required',
 				'address_line1' => 'required|max:255|min:3',
 				'address_line2' => 'max:255',
+				'address_line3' => 'max:255',
+				'shipping_address' => 'required_if:shipping_address_check,==,"0"',
+				'aadhar_no' => 'required',
+				'pan_no' => 'required',
 				// 'pincode' => 'required|max:6|min:6',
 			], $error_messages);
 			if ($validator->fails()) {
 				return response()->json(['success' => false, 'errors' => $validator->errors()->all()]);
 			}
-
 			DB::beginTransaction();
 			if (!$request->id) {
 				$customer = new Customer;
@@ -217,12 +237,15 @@ class CustomerController extends Controller {
 				$customer->updated_at = Carbon::now();
 				$customer->credit_limits = $request->credit_limits;
 				$customer->credit_days = $request->credit_days;
-				$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'address_line3', 'landmark', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
 				// dd($address);
 				//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 				$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $request->id)->first();
 			}
 			$customer->fill($request->all());
+			if ($request->alter_mobile_no) {
+				$customer->alter_mobile_no = $request->alter_mobile_no;
+			}
 			$customer->company_id = Auth::user()->company_id;
 			if ($request->status == 'Inactive') {
 				$customer->deleted_at = Carbon::now();
@@ -239,6 +262,13 @@ class CustomerController extends Controller {
 			$customer->cash_limit_status = (isset($request->customer_limit_allow) && $request->customer_limit_allow) ? $request->customer_limit_allow : 0;
             //IMS Type By Parthiban V on 29-07-2021
             $customer->ims_type_id = (isset($request->ims_type_id) && $request->ims_type_id) ? $request->ims_type_id : null;
+			//shipping Address by Rajarajan S on 11-04-2022
+			$customer->shipping_address_check = $request->shipping_address_check;
+			if ($request->shipping_address_check == 0) {
+			 $customer->shipping_address = $request->shipping_address; 
+			}
+			$customer->shipping_address = $address->address_line1; 
+			//shipping Address by Rajarajan S on 11-04-2022
 			$customer->save();
 
 			if (!$address) {
@@ -250,7 +280,12 @@ class CustomerController extends Controller {
 			$address->entity_id = $customer->id;
 			$address->address_type_id = 40;
 			$address->name = 'Primary Address';
+			//address line 3 landmark by Rajarajan S on 12-04-2022
+			$address->address_line3 = $request->address_line3 ? $request->address_line3 : null;
+			$address->landmark = $request->landmark ? $request->landmark : null;
+			//address line 3 landmark by Rajarajan S on 12-04-2022
 			$address->save();
+			
 			//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 			if (!$customer_details) {
 				$customer_details = new CustomerDetails;
@@ -275,6 +310,7 @@ class CustomerController extends Controller {
 					->where('company_id', Auth::user()->company_id)
 					->forcedelete();
 			}
+			// dd($address,$customer_details);
 			//Store Customer Dimension By Karthick T on 08-02-2021
 			DB::commit();
 			if (!($request->id)) {
@@ -400,6 +436,77 @@ class CustomerController extends Controller {
 
 	public function getCustomerSave(Request $request) {
 		return Customer::getCustomer($request);
+	}
+
+	public function saveDocument(Request $request) {
+		// dd($request->all());
+		$copies = $request->copies;
+		if ($request->upload_type == "undefined") {
+			return response()->json(['success' => false, 'errors' => 'Please Select upload Type']);
+		}
+		$customer_upload_name = Config::select('id','name')->where('config_type_id', 13)->where('id',$request->upload_type)->first();
+		if ($request->customer_id == null || $request->customer_id == "undefined") {
+			return response()->json(['success' => false, 'errors' => 'Please save the customer after upload']);
+		}
+		if ($copies == "undefined") {
+			return response()->json(['success' => false, 'errors' => 'Please upload invoice copy']);
+		}
+		try {
+
+			if ($copies) {
+				$destination = customerDetails($request->customer_id);
+				$file = $copies;
+				$existing_record = Attachment::where('attachment_of_id', $request->upload_type)
+					->where('entity_id',$request->customer_id)->first();
+				if ($existing_record) {
+					return response()->json(['success' => false, 'errors' => 'The File Already Exist.']);
+				}
+				DB::beginTransaction();
+				$attachment = new Attachment;
+				$extension = '.' . $copies->getClientOriginalExtension();
+				if ($extension!='.pdf') {
+					return response()->json(['success' => false, 'errors' => 'Please upload file in Pdf format.']);
+				}
+				$attachment_name = str_replace(' ','_',strtolower($customer_upload_name->name));
+				
+				$attachmentname = $attachment_name . '_' . date("Y_m_d") . "_" . date("h_i_s") . $extension;
+
+				$check_name = Attachment::where('name', $attachmentname)->first();
+				if ($check_name) {
+					return response()->json(['success' => false, 'errors' => 'Please upload file again.']);
+				}
+				$path = $file->storeAs($destination, $attachmentname);
+				$attachment->attachment_of_id = $request->upload_type;
+				$attachment->attachment_type_id = $request->upload_type;
+				$attachment->entity_id = $request->customer_id;
+				$attachment->name = $attachmentname;
+				$attachment->path = $path;
+				$attachment->save();
+
+			}
+			DB::commit();
+			$attachments = Attachment::select('id', 'entity_id', 'attachment_of_id', 'attachment_type_id', 'name')
+			->whereIn('attachment_of_id', [129238,129237,129236])->get();
+
+			$view = URL::asset('public/theme/img/table/view.svg');
+			$delete = URL::asset('public/theme/img/table/delete.svg');
+			return response()->json(['success' => true, 'attachments' => $attachments, 'view' => $view, 'delete' => $delete]);
+		} catch (Exceprion $e) {
+			DB::rollBack();
+			return response()->json(['success' => false, 'errors' => ['Exception Error' => $e->getMessage()]]);
+		}
+	}
+	public function deleteDocumentEdit($id) {
+		$attachment = Attachment::where('id', $id)->first();
+		if (!$attachment) {
+			return response()->json(['success' => false, 'errors' => 'The Attachment Cannot found.']);
+		}
+		$destination = $attachment->path;
+		Storage::makeDirectory($destination, 0777);
+		Storage::disk('local')->delete($destination);
+		$attachment->forceDelete();
+
+		return response()->json(['success' => true]);
 	}
 
 }

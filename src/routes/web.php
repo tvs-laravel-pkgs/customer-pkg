@@ -16,5 +16,8 @@ Route::group(['namespace' => 'Abs\CustomerPkg', 'middleware' => ['web', 'auth'],
 	Route::post('/customer/get/pkg', 'CustomerController@getCustomerAddressPkg')->name('getCustomerAddressPkg');
 
 	Route::get('/customer/get-filter-data', 'CustomerController@getCustomerFilterData')->name('getCustomerFilterData');
+	Route::post('/customer/saveDocument', 'CustomerController@saveDocument')->name('saveCustomerDocument');
+
+	Route::get('/customer/delete_document/{id}', 'CustomerController@deleteDocumentEdit')->name('deleteDocumentEdit');
 
 });

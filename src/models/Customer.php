@@ -29,6 +29,7 @@ class Customer extends BaseModel {
 		'cust_group',
 		'dimension',
 		'mobile_no',
+		'alter_mobile_no',
 		'email',
 		'company_id',
 		'address',

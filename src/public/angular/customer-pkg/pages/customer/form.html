@@ -80,8 +80,18 @@
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Mobile Number</label>
-                                                <input type="text" class="form-control" ng-model="$ctrl.customer.mobile_no" name="mobile_no" placeholder="Enter Mobile Number" />
+                                                <label>Mobile Number <span class="mandatory">*</span></label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.mobile_no" name="mobile_no"
+                                                 placeholder="Enter Mobile Number" maxLength="10" minLength="10" 
+                                                 oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" />
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>Alter Native Mobile Number </label>
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.alter_mobile_no" name="alter_mobile_no" 
+                                                placeholder="Enter Alter Native Mobile Number"  maxLength="10" minLength="10" 
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -111,13 +121,13 @@
                                         <!--Add Aadhar and PAN no to customer by Karthik kumar on 19-02-2020 -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>Aadhar Number</label>
+                                                <label>Aadhar Number<span class="mandatory">*</span></label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.customer_details.aadhar_no" name="aadhar_no" placeholder="Enter Aadhar Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
-                                                <label>PAN Number</label>
+                                                <label>PAN Number<span class="mandatory">*</span></label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.customer_details.pan_no" name="pan_no" placeholder="Enter PAN Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
@@ -248,39 +258,17 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
-                                                    Country
-                                                    <sup class="mandatory">*</sup>
+                                                    Address Line 3
                                                 </label>
-                                                <md-select ng-model="$ctrl.address.country_id" ng-change="onSelectedCountry($ctrl.address.country_id);$ctrl.address.state_id='';$ctrl.address.city_id=''" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
-                                                    <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
-                                                    </md-select-header>
-                                                    <md-optgroup label="Customer Group List">
-                                                        <md-option ng-value="country.id" ng-repeat="country in $ctrl.country_list | filter:searchTravel">
-                                                            {{country.name}}
-                                                        </md-option>
-                                                    </md-optgroup>
-                                                </md-select>
-                                                <input type="hidden" name="country_id" value='{{$ctrl.address.country_id}}' class="required">
+                                                <input type="text" class="form-control" ng-model="$ctrl.address.address_line3" name="address_line3" placeholder="Enter Address Line 3" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
-                                                    State
-                                                    <sup class="mandatory">*</sup>
+                                                   LandMark
                                                 </label>
-                                                <md-select ng-model="$ctrl.address.state_id" ng-change="onSelectedState($ctrl.address.state_id);$ctrl.address.city_id=''" placeholder="Select State" data-md-container-class="selectdemoSelectHeader">
-                                                    <md-select-header class="demo-select-header ng-hide">
-                                                        <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
-                                                    </md-select-header>
-                                                    <md-optgroup label="">
-                                                        <md-option ng-value="state.id" ng-repeat="state in $ctrl.state_list | filter:searchTravel">
-                                                            {{state.name}}
-                                                        </md-option>
-                                                    </md-optgroup>
-                                                </md-select>
-                                                <input type="hidden" name="state_id" value='{{$ctrl.address.state_id}}' class="required">
+                                                <input type="text" class="form-control" ng-model="$ctrl.address.landmark" name="landmark" placeholder="Enter LandMark" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -305,20 +293,120 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
+                                                    State
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <md-select ng-model="$ctrl.address.state_id" ng-change="onSelectedState($ctrl.address.state_id);$ctrl.address.city_id=''" placeholder="Select State" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="state.id" ng-repeat="state in $ctrl.state_list | filter:searchTravel">
+                                                            {{state.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="state_id" value='{{$ctrl.address.state_id}}' class="required">
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Country
+                                                    <sup class="mandatory">*</sup>
+                                                </label>
+                                                <md-select ng-model="$ctrl.address.country_id" ng-change="onSelectedCountry($ctrl.address.country_id);$ctrl.address.state_id='';$ctrl.address.city_id=''" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header ng-hide">
+                                                        <input ng-model="searchCustomerGroup" type="search" placeholder="Search Customer Group" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="Customer Group List">
+                                                        <md-option ng-value="country.id" ng-repeat="country in $ctrl.country_list | filter:searchTravel">
+                                                            {{country.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="country_id" value='{{$ctrl.address.country_id}}' class="required">
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
                                                     Pincode
                                                 </label>
                                                 <input type="text" class="form-control" ng-model="$ctrl.address.pincode" name="pincode" placeholder="Enter Pincode" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Same As Shipping Address<span class="mandatory">*</span></label>
+                                                <div class="common-radio-button">
+                                                    <input type="radio" id="radio_shipping_yes" name="shipping_address_check" value="1" ng-value="1" value="1" ng-model="$ctrl.customer.radio_shipping" ng-checked="$ctrl.customer.radio_shipping_yes" />
+                                                    <label for="radio_shipping_yes">Yes</label>
+                                                    <input type="radio" id="radio_shipping_no" name="shipping_address_check" value="0" ng-value="0" value="0" ng-model="$ctrl.customer.radio_shipping" ng-checked="$ctrl.customer.radio_shipping_no" />
+                                                    <label for="radio_shipping_no">No</label>
+                                                </div>
+                                                <input type="hidden" name="shipping_address_check_error" value='{{$ctrl.customer.radio_shipping}}' class="required">
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-6" ng-if="$ctrl.customer.radio_shipping == 0">
                                             <div class="input-text form-group">
-                                                <label class="table-form-list-label">
-                                                    Full Address
+                                                <label>
+                                                    Shipping Address
                                                     <span class="mandatory">*</span>
                                                 </label>
-                                                <textarea name="address" ng-model="$ctrl.customer.address" class="form-control required" rows="3" placeholder="Enter Address"></textarea>
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.shipping_address" name="shipping_address" placeholder="Enter Shipping Address" />
                                             </div>
                                         </div>
+                                        <div class="col-md-12"></div>
+                                        <div class="col-md-3" ng-if="$ctrl.action == 'Edit'">
+                                            <div class="input-text form-group">
+                                                <label>Upload Type</label>
+                                                <md-select ng-model="$ctrl.customer_upload_types.id" placeholder="Select Customer Upload">
+                                                    <md-optgroup label="Customer upload List">
+                                                        <md-option ng-value="upload_type.id" ng-repeat="upload_type in $ctrl.customer_upload_types ">
+                                                            {{upload_type.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="customer_upload_type" id="customer_upload_type" value='{{$ctrl.customer_upload_types.id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3" ng-if="$ctrl.action == 'Edit'">
+                                            <div class="form-group">
+                                                <label>File Upload</label>
+                                                <div class="file-upload-wrapper" data-text="Enter Click to upload">
+                                                    <input type="file" name="copies[]" id="copies" class="file-upload-field" placeholder="Enter Click to upload" />
+                                                </div><!-- File -->
+                                            </div><!-- Field -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3" ng-if="$ctrl.action == 'Edit'">
+                                            <div class="form-group">
+                                                <label class="opacity-zero">Upload Button</label>
+                                                <button type="button" ng-click="upload()" class="btn btn-bordered" id="upload">UPLOAD</button>
+                                            </div><!-- Field -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-12" ng-if="$ctrl.action == 'Edit'">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr id="file-head">
+                                                        <th>File Name</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="file-list">
+                                                    <tr class="upload_list" ng-repeat="(key, attachment) in $ctrl.attachments">
+                                                        <td> {{attachment.name}} </td>
+                                                        <td class="action"> <a href="storage/app/public/customer/{{attachment.entity_id}}/{{attachment.name}}" target="_blank">
+                                                                <img class="img-responsive" src="public/theme/img/table/view.svg">
+                                                            </a>
+                                                            <a href="javascript:void(0)" value="{{attachment.id}}" class="delete_edit_upload">
+                                                                <img class="img-responsive" src="public/theme/img/table/delete.svg">
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div><!-- column -->
                                         <div class="tab-pane-footer">
                                             <div class="row">
                                                 <div class="col-md-12">

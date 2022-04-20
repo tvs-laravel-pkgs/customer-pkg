@@ -190,6 +190,15 @@ app.component('customerForm', {
                 } else {
                     self.switch_value = 'Active';
                 }
+                if (response.data.customer.shipping_address_check == 1) {
+                    self.customer.radio_shipping_yes = 1;
+                    self.customer.radio_shipping = 1;
+                } else {
+                    self.customer.radio_shipping_no = 1;
+                    self.customer.radio_shipping = 0;
+                }
+                self.attachments = response.data.attachments;
+                
             } else {
                 self.customer.pdf_format_id = 11310; // REGULAR PDF FORMAT FOR CNDN
                 self.switch_value = 'Active';
@@ -197,11 +206,17 @@ app.component('customerForm', {
                 self.city_list = [{ 'id': '', 'name': 'Select City' }];
                 //Customer cash limit by Karthick T on 14-12-2020
                 self.customer.cash_limit_status = 1;
+                self.customer.radio_shipping_yes = 1;
             }
+            
             //Outlet by Karthick T on 23-10-2020
             self.outlet_list = response.data.outlet_list;
             //IMS type BY PARTHIBAN V ON 29-07-2021
             self.ims_type_list=response.data.ims_type_list;
+            //Customer details upload type by Rajarajan S on 18-04-2022
+            self.customer_upload_types= response.data.customer_upload_types;
+            //Customer details upload type by Rajarajan S on 18-04-2022
+
         });
 
         /* Tab Funtion */
@@ -263,11 +278,6 @@ app.component('customerForm', {
                 },
                 'dimension': {
                     maxlength: 50,
-                },
-                'address': {
-                    required: true,
-                    minlength: 5,
-                    maxlength: 250,
                 },
                 'address_line1': {
                     minlength: 3,
@@ -378,6 +388,84 @@ app.component('customerForm', {
                         }, 3000);
                     });
             }
+        });
+        //file upload 
+        $scope.upload = function() {
+            $('#upload').button('loading');
+            var file_data = $('#copies').prop('files')[0];
+            var upload_type_data = $('#customer_upload_type').attr('value');
+            var form_data = new FormData();
+            form_data.append('copies', file_data);
+            form_data.append('customer_id', self.customer.id);
+            form_data.append('upload_type', upload_type_data);
+            $.ajax({
+                    url: laravel_routes['saveCustomerDocument'],
+                    method: "POST",
+                    data: form_data,
+                    processData: false,
+                    contentType: false,
+
+                })
+                .done(function(res) {
+
+
+                    if (!res.success) {
+                        new Noty({
+                            type: 'error',
+                            layout: 'topRight',
+                            text: res.errors
+                        }).show();
+                        $('#upload').button('reset');
+                    } else {
+
+                        var params = res.attachments;
+                        var design = '';
+                        $('#file-list').html('');
+                        
+                        $.each(params, function() {
+                            $('#file-head').show();
+                            design += '<tr>' +
+
+                                '<td>' + this.name + '</td>' +
+
+                                '<td class="action">' + '<a href ="storage/app/public/customer/' + self.customer.id + '/' + this.name + '" target="new">' +
+                                '<img class="img-responsive" src="' + res.view + '">' +
+                                '</a>' +
+                                '<a href="javascript:void(0)" value="' + this.id + '" class="delete_edit_upload">' +
+                                '<img class="img-responsive" src="' + res.delete + '">' +
+                                '</a>' + '</td>' +
+                                '</tr>';
+                        });
+                        $('#file-list').append(design);
+                        $(".copies").val('').trigger('change');
+                        $('#upload').button('reset');
+                    }
+                })
+
+                .fail(function(xhr) {
+                    new Noty({
+                        type: 'error',
+                        layout: 'topRight',
+                        text: 'Something went wrong at server.'
+                    }).show();
+                    $('#upload').button('reset');
+                })
+
+        }
+
+        // $scope.delete_attachment = function(id) {
+        //     $(this).closest('tr').remove();
+        //     $http.get(
+        //         customer_edit_document_delete_url + '/' + id
+        //     )
+        // }
+        $(document).on('click', '.delete_edit_upload', function() {
+            $(this).closest('tr').remove();
+            var id = $(this).attr('value');
+            $http.get(
+                customer_edit_document_delete_url + '/' + id
+            )
+
         });
     }
 });
