@@ -264,10 +264,10 @@ class CustomerController extends Controller {
             $customer->ims_type_id = (isset($request->ims_type_id) && $request->ims_type_id) ? $request->ims_type_id : null;
 			//shipping Address by Rajarajan S on 11-04-2022
 			$customer->shipping_address_check = $request->shipping_address_check;
+			$customer->shipping_address = $address->address_line1 ? $address->address_line1 : null; 
 			if ($request->shipping_address_check == 0) {
-			 $customer->shipping_address = $request->shipping_address; 
+			 $customer->shipping_address = $request->shipping_address ? $request->shipping_address : null; 
 			}
-			$customer->shipping_address = $address->address_line1; 
 			//shipping Address by Rajarajan S on 11-04-2022
 			$customer->save();
 
