@@ -789,6 +789,7 @@ class Customer extends BaseModel {
 		$trade_name = NULL;
 		$error = NULL;
 		$address = '';
+		$date_of_registration = null;
 		// dump($gst_validate);
 		// dd(1);
 		// if ($gst_validate) {
@@ -883,6 +884,10 @@ class Customer extends BaseModel {
                     $address .= $gst_validate['AddrPncd'];
                     $address .= '';
                 }
+
+                if(isset($gst_validate['DtReg'])){
+                	$date_of_registration = $gst_validate['DtReg'];
+                }
 			}
 		} else {
 			return response()->json([
@@ -898,6 +903,7 @@ class Customer extends BaseModel {
 				'trade_name' => $trade_name,
 				'legal_name' => $legal_name,
 				'address' => $address,
+				'date_of_registration' => $date_of_registration,
 			]);
 		} else {
 			return response()->json([
