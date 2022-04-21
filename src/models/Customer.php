@@ -9,6 +9,7 @@ use App\BaseModel;
 use App\Company;
 use App\Outlet;
 use App\Receipt;
+use App\State;
 use Auth;
 use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -787,6 +788,7 @@ class Customer extends BaseModel {
 		$legal_name = NULL;
 		$trade_name = NULL;
 		$error = NULL;
+		$address = '';
 		// dump($gst_validate);
 		// dd(1);
 		// if ($gst_validate) {
@@ -853,6 +855,34 @@ class Customer extends BaseModel {
 				} else {
 					$legal_name = NULL;
 				}
+
+				if (isset($gst_validate['AddrBno'])) {
+                    $address .= $gst_validate['AddrBno'];
+                    $address .= ',';
+                }
+                if (isset($gst_validate['AddrSt'])) {
+                    $address .= $gst_validate['AddrSt'];
+                    $address .= ',';
+                }
+                if (isset($gst_validate['AddrLoc'])) {
+                    $address .= $gst_validate['AddrLoc'];
+                    $address .= ',';
+                }
+
+                if (isset($gst_validate['StateCode'])) {
+                    $state = State::where('e_invoice_state_code', $gst_validate['StateCode'])
+                    	->pluck('name')
+                    	->first();
+                    if ($state) {
+                        $address .= $state;
+                        $address .= ',';
+                    }
+                }
+
+                if (isset($gst_validate['AddrPncd'])) {
+                    $address .= $gst_validate['AddrPncd'];
+                    $address .= '';
+                }
 			}
 		} else {
 			return response()->json([
@@ -867,6 +897,7 @@ class Customer extends BaseModel {
 				'success' => true,
 				'trade_name' => $trade_name,
 				'legal_name' => $legal_name,
+				'address' => $address,
 			]);
 		} else {
 			return response()->json([
