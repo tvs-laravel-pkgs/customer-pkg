@@ -591,11 +591,17 @@ class Customer extends BaseModel {
 				'bdo_secret'=>$decrypt_data_with_bdo_sek,
 				'app_secret'=>$app_secret_key])
 			->update(['status'=>'0']);
-			return [
-                'success' => false,
-                'error' => "GSP AUTHTOKEN IS NOT VALID, TRY AGAIN",
-                'errors' => []
-            ];
+			// return [
+   //              'success' => false,
+   //              'error' => "GSP AUTHTOKEN IS NOT VALID, TRY AGAIN",
+   //              'errors' => []
+   //          ];
+
+			return response()->json([
+				'success' => false,
+				'error' => "GSP AUTHTOKEN IS NOT VALID, TRY AGAIN",
+				'errors' => []],
+			]);
 		}
 
 		DB::beginTransaction();
