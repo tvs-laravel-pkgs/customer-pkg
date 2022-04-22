@@ -600,7 +600,7 @@ class Customer extends BaseModel {
 			return response()->json([
 				'success' => false,
 				'error' => "GSP AUTHTOKEN IS NOT VALID, TRY AGAIN",
-				'errors' => []],
+				'errors' => [],
 			]);
 		}
 
