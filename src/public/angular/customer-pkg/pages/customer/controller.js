@@ -198,6 +198,7 @@ app.component('customerForm', {
                 //Customer cash limit by Karthick T on 14-12-2020
                 self.customer.cash_limit_status = 1;
             }
+            self.customer.cust_send_mail = 0;
             //Outlet by Karthick T on 23-10-2020
             self.outlet_list = response.data.outlet_list;
             //IMS type BY PARTHIBAN V ON 29-07-2021
