@@ -797,6 +797,7 @@ class Customer extends BaseModel {
 		$error = NULL;
 		$address = '';
 		$date_of_registration = null;
+		$gst_status = null;
 		// dump($gst_validate);
 		// dd(1);
 		// if ($gst_validate) {
@@ -895,6 +896,10 @@ class Customer extends BaseModel {
                 if(isset($gst_validate['DtReg'])){
                 	$date_of_registration = $gst_validate['DtReg'];
                 }
+
+                if(isset($gst_validate['Status'])){
+                	$gst_status = $gst_validate['Status'];
+                }
 			}
 		} else {
 			return response()->json([
@@ -911,6 +916,7 @@ class Customer extends BaseModel {
 				'legal_name' => $legal_name,
 				'address' => $address,
 				'date_of_registration' => $date_of_registration,
+				'gst_status' => $gst_status,
 			]);
 		} else {
 			return response()->json([
