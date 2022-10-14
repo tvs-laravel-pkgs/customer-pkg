@@ -553,8 +553,8 @@ class Customer extends BaseModel {
 		$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
 		if ($gstValidation == '1')	// If the validation is true
 			$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
-		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //UAT
-
+			$bdo_check_gstin_url = $bdoUrl . '/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
+		// dd($bdo_check_gstin_url);
 		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
 		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //LIVE
 		// dd($bdo_check_gstin_url);
