@@ -548,11 +548,12 @@ class Customer extends BaseModel {
 		// 	$errors[] = 'Decryption Error!';
 		// 	return response()->json(['success' => false, 'error' => 'Decryption Error!']);
 		// }
+		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin; //UAT
 		// $bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
 		$gstValidation = Config::getConfigName(133123);
-		$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
+		$bdoUrl = config('custom.BDO_URL');
+		$bdo_check_gstin_url = $bdoUrl . '/bdoapi/public/getgstinDetails/' . $gstin;
 		if ($gstValidation == '1')	// If the validation is true
-			$bdo_check_gstin_url = 'https://einvoiceapi.bdo.in/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
 			$bdo_check_gstin_url = $bdoUrl . '/bdoapi/public/syncGstinDetailsFromCP/' . $gstin; //LIVE
 		// dd($bdo_check_gstin_url);
 		// $bdo_check_gstin_url = 'https://sandboxeinvoiceapi.bdo.in/bdoapi/public/getgstinDetails/' . $gstin;
