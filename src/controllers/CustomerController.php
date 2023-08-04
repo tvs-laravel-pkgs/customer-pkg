@@ -99,15 +99,17 @@ class CustomerController extends Controller {
 			->addColumn('action', function ($customer) {
 				$edit_img = asset('public/theme/img/table/cndn/edit.svg');
 				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
-				return '
-					<a href="#!/customer-pkg/customer/edit/' . $customer->id . '">
+				$action = '';
+				$action .= '<a href="#!/customer-pkg/customer/edit/' . $customer->id . '">
 						<img src="' . $edit_img . '" alt="View" class="img-responsive">
-					</a>
-					<a href="javascript:;" data-toggle="modal" data-target="#delete_customer"
-					onclick="angular.element(this).scope().deleteCustomer(' . $customer->id . ')" dusk = "delete-btn" title="Delete">
-					<img src="' . $delete_img . '" alt="delete" class="img-responsive">
-					</a>
-					';
+					</a>';
+				if (Entrust::can('delete-customer')) {
+						$action .= '<a href="javascript:;" data-toggle="modal" data-target="#delete_customer"
+							onclick="angular.element(this).scope().deleteCustomer(' . $customer->id . ')" dusk = "delete-btn" title="Delete">
+							<img src="' . $delete_img . '" alt="delete" class="img-responsive">
+						</a>';
+				}
+				return $action;
 			})
 			->make(true);
 	}
