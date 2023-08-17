@@ -7,6 +7,7 @@ use App\City;
 use App\Config;
 use App\Country;
 use App\CustomerDetails;
+use App\Sbu;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WpoSoapController;
 use App\Outlet;
@@ -156,6 +157,10 @@ class CustomerController extends Controller {
 		)->prepend(['id' => '', 'code' => 'Select Outlet']);
         //IMS Type by Parthiban V on 29-07-2021
         $this->data['ims_type_list'] =  Collect(Config::select('id', 'name')->where('config_type_id', 254)->get())->prepend(['id' => '', 'name' => 'Select IMS Type']);
+		$this->data['sbu_list'] = Collect(Sbu::select(DB::raw('CONCAT(IFNULL(sbus.name,""), " / ", IFNULL(sbus.oracle_code,"")) as name'), 'id')
+				->where('company_id', Auth::user()->company_id)
+				->get()
+			)->prepend(['id' => '', 'name' => 'Select LOB']);
 
 		return response()->json($this->data);
 	}
@@ -241,6 +246,8 @@ class CustomerController extends Controller {
 			$customer->cash_limit_status = (isset($request->customer_limit_allow) && $request->customer_limit_allow) ? $request->customer_limit_allow : 0;
             //IMS Type By Parthiban V on 29-07-2021
             $customer->ims_type_id = (isset($request->ims_type_id) && $request->ims_type_id) ? $request->ims_type_id : null;
+			if (isset($request->lob_id))
+				$customer->lob_id = $request->lob_id;
 			$customer->save();
 
 			if (!$address) {

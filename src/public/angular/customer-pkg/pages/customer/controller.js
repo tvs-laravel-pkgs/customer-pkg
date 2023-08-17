@@ -181,6 +181,7 @@ app.component('customerForm', {
             self.pdf_format_list = response.data.pdf_format_list;
             self.action = response.data.action;
             self.customer_details = response.data.customer_details;
+            self.sbu_list = response.data.sbu_list;
             $rootScope.loading = false;
             if (self.action == 'Edit') {
                 $scope.onSelectedCountry(self.address.country_id);

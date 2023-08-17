@@ -152,6 +152,22 @@
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
+                                                <label>LOB</label>
+                                                <md-select ng-model="$ctrl.customer.lob_id" placeholder="Select LOB" data-md-container-class="selectdemoSelectHeader">
+                                                    <md-select-header class="demo-select-header">
+                                                        <input ng-model="searchCustomerLob" type="search" placeholder="Search LOB" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                    </md-select-header>
+                                                    <md-optgroup label="">
+                                                        <md-option ng-value="lob.id" ng-repeat="lob in $ctrl.sbu_list | filter:searchCustomerLob">
+                                                            {{lob.name}}
+                                                        </md-option>
+                                                    </md-optgroup>
+                                                </md-select>
+                                                <input type="hidden" name="lob_id" value='{{$ctrl.customer.lob_id}}'>
+                                            </div><!-- Feild -->
+                                        </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
                                                 <label>
                                                     PDF Format
                                                 </label>
