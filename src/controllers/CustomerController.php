@@ -123,7 +123,7 @@ class CustomerController extends Controller {
 			$action = 'Add';
 		} else {
 			$customer = Customer::withTrashed()->find($id);
-			$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $id)->first();
+			$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode','gst_number')->where('address_of_id', 24)->where('entity_id', $id)->first();
 			//Add Pan && Aadhar to Customer details by Karthik Kumar on 19-02-2020
 			$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $id)->first();
 			if (!$address) {
@@ -220,14 +220,18 @@ class CustomerController extends Controller {
 				$customer_details = new CustomerDetails;
 			} else {
 				$customer = Customer::withTrashed()->find($request->id);
+				//dd($customer->gst_number);
 				$customer->updated_by_id = Auth::user()->id;
 				$customer->updated_at = Carbon::now();
 				$customer->credit_limits = $request->credit_limits;
 				$customer->credit_days = $request->credit_days;
-				$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
-				// dd($address);
+				//$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				$address->address_line1 = $request->address_line1;
+				$address->pincode = $request->pincode;
+				$address->gst_number = $request->gst_number;
 				//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
-				$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $request->id)->first();
+				$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $request->id)->first();			
 			}
 			$customer->fill($request->all());
 			$customer->company_id = Auth::user()->company_id;
@@ -245,20 +249,21 @@ class CustomerController extends Controller {
 			//Customer cash limit by Karthick T on 14-12-2020
 			$customer->cash_limit_status = (isset($request->customer_limit_allow) && $request->customer_limit_allow) ? $request->customer_limit_allow : 0;
             //IMS Type By Parthiban V on 29-07-2021
-            $customer->ims_type_id = (isset($request->ims_type_id) && $request->ims_type_id) ? $request->ims_type_id : null;
+            $customer->ims_type_id = (isset($request->ims_type_id) && $request->ims_type_id) ? $request->ims_type_id : null;			
 			if (isset($request->lob_id))
 				$customer->lob_id = $request->lob_id;
 			$customer->save();
-
 			if (!$address) {
 				$address = new Address;
 			}
+
 			$address->fill($request->all());
 			$address->company_id = Auth::user()->company_id;
 			$address->address_of_id = 24;
 			$address->entity_id = $customer->id;
 			$address->address_type_id = 40;
 			$address->name = 'Primary Address';
+			$address->gst_number = $request->gst_number;
 			$address->save();
 			//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 			if (!$customer_details) {
