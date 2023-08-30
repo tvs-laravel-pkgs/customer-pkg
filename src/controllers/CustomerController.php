@@ -123,7 +123,32 @@ class CustomerController extends Controller {
 			$action = 'Add';
 		} else {
 			$customer = Customer::withTrashed()->find($id);
-			$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode','gst_number')->where('address_of_id', 24)->where('entity_id', $id)->first();
+			// $address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode','gst_number')->where('address_of_id', 24)->where('entity_id', $id)->first();
+
+			$customer_primary_address = Address::where('company_id', $customer->company_id)
+                ->where('entity_id', $customer->id)
+                ->where('address_of_id', 24)
+                ->where('address_type_id',40)
+                ->where('is_primary',1)
+                ->orderBy('id', 'DESC')
+                ->first();
+            $customer_non_primary_address = Address::where('company_id', $customer->company_id)
+                ->where('entity_id', $customer->id)
+                ->where('address_of_id', 24)
+                ->where('address_type_id',40)
+                ->where(function($q) {
+                    $q->where('is_primary', 0)
+                    ->orWhereNull('is_primary');
+                })
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            if(!empty($customer_primary_address)){
+            	$address = $customer_primary_address;
+            }else{
+            	$address = $customer_non_primary_address;
+            }
+
 			//Add Pan && Aadhar to Customer details by Karthik Kumar on 19-02-2020
 			$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $id)->first();
 			if (!$address) {
@@ -166,7 +191,7 @@ class CustomerController extends Controller {
 	}
 
 	public function saveCustomer(Request $request) {
-
+		// dd($request->all());
 		try {
 			$error_messages = [
 				'code.required' => 'Customer Code is Required',
@@ -184,6 +209,7 @@ class CustomerController extends Controller {
 				'address_line1.max' => 'Maximum 255 Characters',
 				'address_line1.min' => 'Minimum 3 Characters',
 				'address_line2.max' => 'Maximum 255 Characters',
+				'street.max' => 'Maximum 255 Characters',
 				// 'pincode.required' => 'Pincode is Required',
 				// 'pincode.max' => 'Maximum 6 Characters',
 				// 'pincode.min' => 'Minimum 6 Characters',
@@ -202,6 +228,7 @@ class CustomerController extends Controller {
 				'address' => 'required',
 				'address_line1' => 'required|max:255|min:3',
 				'address_line2' => 'max:255',
+				'street' => 'max:255',
 				// 'pincode' => 'required|max:6|min:6',
 			], $error_messages);
 			if ($validator->fails()) {
@@ -228,10 +255,11 @@ class CustomerController extends Controller {
 				$customer->credit_days = $request->credit_days;
 				$customer->pan_number = $request->pan_no;
 				//$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
-				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
-				$address->address_line1 = $request->address_line1;
-				$address->pincode = $request->pincode;
-				$address->gst_number = $request->gst_number;
+				// $address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
+				$address = Address::where('id', $request->address_id)->first();
+				// $address->address_line1 = $request->address_line1;
+				// $address->pincode = $request->pincode;
+				// $address->gst_number = $request->gst_number;
 				//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 				$customer_details = CustomerDetails::select('customer_id', 'pan_no', 'aadhar_no')->where('customer_id', $request->id)->first();			
 			}
@@ -266,6 +294,7 @@ class CustomerController extends Controller {
 			$address->address_type_id = 40;
 			$address->name = 'Primary Address';
 			$address->gst_number = $request->gst_number;
+			$address->street = $request->street;
 			$address->save();
 			//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 			if (!$customer_details) {
@@ -298,9 +327,14 @@ class CustomerController extends Controller {
 			} else {
 				return response()->json(['success' => true, 'message' => ['Customer Details Updated Successfully']]);
 			}
-		} catch (Exceprion $e) {
+		} catch (\Exception $e) {
 			DB::rollBack();
-			return response()->json(['success' => false, 'errors' => ['Exception Error' => $e->getMessage()]]);
+            return response()->json([
+                'success' => false,
+                'errors' => [
+                    'Error : ' . $e->getMessage() . '. Line : ' . $e->getLine() . '. File : ' . $e->getFile(),
+                ],
+            ]);
 		}
 	}
 	public function deleteCustomer($id) {
