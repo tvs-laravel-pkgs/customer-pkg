@@ -300,7 +300,9 @@ class CustomerController extends Controller {
 			$address->address_type_id = 40;
 			$address->name = 'Primary Address';
 			$address->gst_number = $request->gst_number;
-			$address->street = $request->street;
+			if($request->street){
+				$address->street = $request->street;
+			}
 			$address->save();
 			//Add Pan && Aadhar to Customer details by Karthik kumar on 19-02-2020
 			if (!$customer_details) {
