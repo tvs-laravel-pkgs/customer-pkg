@@ -112,13 +112,15 @@
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>Aadhar Number</label>
-                                                <input type="text" class="form-control" ng-model="$ctrl.customer_details.aadhar_no" name="aadhar_no" placeholder="Enter Aadhar Number" />
+                                                <!-- <input type="text" class="form-control" ng-model="$ctrl.customer_details.aadhar_no" name="aadhar_no" placeholder="Enter Aadhar Number" /> -->
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.aadhar_number" name="aadhar_no" placeholder="Enter Aadhar Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>PAN Number</label>
-                                                <input type="text" class="form-control" ng-model="$ctrl.customer_details.pan_no" name="pan_no" placeholder="Enter PAN Number" />
+                                                <!-- <input type="text" class="form-control" ng-model="$ctrl.customer_details.pan_no" name="pan_no" placeholder="Enter PAN Number" /> -->
+                                                <input type="text" class="form-control" ng-model="$ctrl.customer.pan_number" name="pan_no" placeholder="Enter PAN Number" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -242,6 +244,7 @@
                                 </div><!-- Tab Pane Wrap -->
                             </div><!-- Tabe Pane -->
                             <div class="tab-pane fade" id="address-details" data-animation="fadeInUp" data-animation-delay="300">
+                                <input type="hidden" name="address_id" value="{{$ctrl.address.id}}">
                                 <div class="tab-pane-wrap">
                                     <div class="row">
                                         <div class="col-md-3">
@@ -333,6 +336,14 @@
                                                     <span class="mandatory">*</span>
                                                 </label>
                                                 <textarea name="address" ng-model="$ctrl.customer.address" class="form-control required" rows="3" placeholder="Enter Address"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label class="table-form-list-label">
+                                                    Street
+                                                </label>
+                                                <textarea name="street" ng-model="$ctrl.address.street" class="form-control" rows="3" placeholder="Enter Street"></textarea>
                                             </div>
                                         </div>
                                         <div class="tab-pane-footer">
