@@ -296,9 +296,14 @@ class CustomerController extends Controller {
 			} else {
 				return response()->json(['success' => true, 'message' => ['Customer Details Updated Successfully']]);
 			}
-		} catch (Exceprion $e) {
+		} catch (\Exception $e) {
 			DB::rollBack();
-			return response()->json(['success' => false, 'errors' => ['Exception Error' => $e->getMessage()]]);
+            return response()->json([
+                'success' => false,
+                'errors' => [
+                    'Error : ' . $e->getMessage() . '. Line : ' . $e->getLine() . '. File : ' . $e->getFile(),
+                ],
+            ]);
 		}
 	}
 	public function deleteCustomer($id) {
