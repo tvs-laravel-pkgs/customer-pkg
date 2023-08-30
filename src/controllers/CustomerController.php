@@ -216,6 +216,7 @@ class CustomerController extends Controller {
 				$customer->updated_at = NULL;
 				$customer->credit_limits = $request->credit_limits;
 				$customer->credit_days = $request->credit_days;
+				$customer->pan_number = $request->pan_no;
 				$address = new Address;
 				$customer_details = new CustomerDetails;
 			} else {
@@ -225,6 +226,7 @@ class CustomerController extends Controller {
 				$customer->updated_at = Carbon::now();
 				$customer->credit_limits = $request->credit_limits;
 				$customer->credit_days = $request->credit_days;
+				$customer->pan_number = $request->pan_no;
 				//$address = Address::select('address_of_id', 'entity_id', 'address_type_id', 'name', 'address_line1', 'address_line2', 'country_id', 'state_id', 'city_id', 'pincode')->where('address_of_id', 24)->where('entity_id', $request->id)->first();
 				$address = Address::where('address_of_id', 24)->where('entity_id', $request->id)->first();
 				$address->address_line1 = $request->address_line1;
