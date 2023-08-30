@@ -273,6 +273,12 @@ class CustomerController extends Controller {
 				$customer->deleted_at = NULL;
 			}
 			$customer->gst_number = $request->gst_number;
+			if($request->aadhar_no){
+				$customer->aadhar_number = $request->aadhar_no;
+			}
+			if($request->pan_no){
+				$customer->pan_number = $request->pan_no;
+			}	
 			$customer->axapta_location_id = $request->axapta_location_id;
 			//Outlet by Karthick T on 23-10-2020
 			$customer->outlet_id = $request->outlet_id;
