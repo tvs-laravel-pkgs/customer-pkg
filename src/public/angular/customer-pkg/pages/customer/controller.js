@@ -183,9 +183,22 @@ app.component('customerForm', {
             self.customer_details = response.data.customer_details;
             self.sbu_list = response.data.sbu_list;
             $rootScope.loading = false;
+            self.customer_address_details = response.data.customer_address_details;
+            self.address_removal_ids = [];
             if (self.action == 'Edit') {
-                $scope.onSelectedCountry(self.address.country_id);
-                $scope.onSelectedState(self.address.state_id);
+                $(self.customer_address_details).each(function(key, value) {
+                    value.country_list = self.country_list;
+                    value.state_list = [];
+                    value.city_list = [];
+                    if(value.country_id){
+                        $scope.onSelectedCountry(value.country_id , key);
+                    }
+                    if(value.state_id){
+                        $scope.onSelectedState(value.state_id , key);
+                    }
+                });
+                // $scope.onSelectedCountry(self.address.country_id);
+                // $scope.onSelectedState(self.address.state_id);
                 if (self.customer.deleted_at) {
                     self.switch_value = 'Inactive';
                 } else {
@@ -221,25 +234,49 @@ app.component('customerForm', {
         $scope.prev = function() {}
 
         //SELECT STATE BASED COUNTRY
-        $scope.onSelectedCountry = function(id) {
+        $scope.onSelectedCountry = function(id, index) {
             customer_get_state_by_country = vendor_get_state_by_country;
             $http.post(
                 customer_get_state_by_country, { 'country_id': id }
             ).then(function(response) {
                 // console.log(response);
-                self.state_list = response.data.state_list;
+                // self.state_list = response.data.state_list;
+                self.customer_address_details[index].state_list = response.data.state_list;
             });
         }
 
         //SELECT CITY BASED STATE
-        $scope.onSelectedState = function(id) {
+        $scope.onSelectedState = function(id,index) {
             customer_get_city_by_state = vendor_get_city_by_state
             $http.post(
                 customer_get_city_by_state, { 'state_id': id }
             ).then(function(response) {
                 // console.log(response);
-                self.city_list = response.data.city_list;
+                // self.city_list = response.data.city_list;
+                self.customer_address_details[index].city_list = response.data.city_list;
             });
+        }
+
+        self.addAddress = function() {
+            self.customer_address_details.push({
+                address_line1 : '',
+                address_line2 : '',
+                country_id : '',
+                state_id : '',
+                city_id : '',
+                street : '',
+                country_list : self.country_list,
+                state_list : [],
+                city_list : [],
+            });
+        }
+
+        self.removeAddress = function(index, address_id) {
+            if(address_id) {
+                self.address_removal_ids.push(address_id);
+                $('#address_removal_ids').val(JSON.stringify(self.address_removal_ids));
+            }
+            self.customer_address_details.splice(index, 1);
         }
 
         var form_id = '#form';
