@@ -38,7 +38,8 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a data-target="#address-details" data-toggle="tab" aria-expanded="true" class="filter">
+                                        <!-- <a data-target="#address-details" data-toggle="tab" aria-expanded="true" class="filter"> -->
+                                        <a data-target="#multi-address-details" data-toggle="tab" aria-expanded="true" class="filter">
                                             Address Details
                                         </a>
                                     </li>
@@ -70,6 +71,15 @@
                                                 <input type="text" class="form-control required" ng-model="$ctrl.customer.name" name="name" placeholder="Enter Customer Name" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
+                                        <div class="col-md-3">
+                                            <div class="input-text form-group">
+                                                <label>
+                                                    Full Address
+                                                    <span class="mandatory">*</span>
+                                                </label>
+                                                <input name="address" ng-model="$ctrl.customer.address" class="form-control required" rows="3" placeholder="Enter Address">
+                                            </div>
+                                        </div>
                                         <div class="col-md-3">
                                             <div class="input-text form-group">
                                                 <label>
@@ -253,7 +263,7 @@
                                                     Address Line 1
                                                     <sup class="mandatory">*</sup>
                                                 </label>
-                                                <input type="text" class="form-control required" ng-model="$ctrl.address.address_line1" name="address_line1" placeholder="Enter Address Line 1" />
+                                                <input type="text" class="form-control" ng-model="$ctrl.address.address_line1" name="address_line1" placeholder="Enter Address Line 1" />
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -280,7 +290,7 @@
                                                         </md-option>
                                                     </md-optgroup>
                                                 </md-select>
-                                                <input type="hidden" name="country_id" value='{{$ctrl.address.country_id}}' class="required">
+                                                <input type="hidden" name="country_id" value='{{$ctrl.address.country_id}}' class="">
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -299,7 +309,7 @@
                                                         </md-option>
                                                     </md-optgroup>
                                                 </md-select>
-                                                <input type="hidden" name="state_id" value='{{$ctrl.address.state_id}}' class="required">
+                                                <input type="hidden" name="state_id" value='{{$ctrl.address.state_id}}' class="">
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -318,7 +328,7 @@
                                                         </md-option>
                                                     </md-optgroup>
                                                 </md-select>
-                                                <input type="hidden" name="city_id" value='{{$ctrl.address.city_id}}' class="required">
+                                                <input type="hidden" name="city_id" value='{{$ctrl.address.city_id}}' class="">
                                             </div><!-- Feild -->
                                         </div><!-- Column -->
                                         <div class="col-md-3">
@@ -335,7 +345,7 @@
                                                     Full Address
                                                     <span class="mandatory">*</span>
                                                 </label>
-                                                <textarea name="address" ng-model="$ctrl.customer.address" class="form-control required" rows="3" placeholder="Enter Address"></textarea>
+                                                <textarea name="address" ng-model="$ctrl.customer.address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -361,6 +371,109 @@
                                     </div><!-- Row -->
                                 </div><!-- Tab Pane Wrap -->
                             </div><!-- Tabe Pane -->
+
+                            <div class="tab-pane fade" id="multi-address-details" data-animation="fadeInUp" data-animation-delay="300">
+                                <input type="hidden" name="address_removal_ids" id="address_removal_ids" value="">
+                                <div class="tab-pane-wrap">
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                                <table class="table table-form">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="width-230">Address Line 1<sup class="mandatory">*</sup></th>
+                                                            <th class="width-230">Address Line 2</th>
+                                                            <th class="width-230">Country<sup class="mandatory">*</sup></th>
+                                                            <th class="width-230">State<sup class="mandatory">*</sup></th>
+                                                            <th class="width-230">City<sup class="mandatory">*</sup></th>
+                                                            <th class="width-230">Pincode</th>
+                                                            <th class="width-230">Street<sup class="mandatory">*</sup></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody ng-repeat="(index, customer_address) in $ctrl.customer_address_details">
+                                                        <input type="hidden" name="customer_addresses[{{index}}][id]" value="{{customer_address.id}}">
+                                                        <tr>
+                                                            <td>
+                                                                <input type="text" class="form-control required" ng-model="customer_address.address_line1" name="customer_addresses[{{index}}][address_line1]" placeholder="Enter Address Line 1" maxlength="255" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control required" ng-model="customer_address.address_line2" name="customer_addresses[{{index}}][address_line2]" placeholder="Enter Address Line 2" maxlength="255"/>
+                                                            </td>
+                                                            <td>
+                                                                <md-select ng-model="customer_address.country_id" ng-change="onSelectedCountry(customer_address.country_id, index);customer_address.state_id='';customer_address.city_id=''" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
+                                                                    <md-select-header class="demo-select-header ng-hide">
+                                                                        <input ng-model="searchCountry" type="search" placeholder="Search Country" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                                    </md-select-header>
+                                                                    <md-optgroup label="Country List">
+                                                                        <md-option ng-value="country.id" ng-repeat="country in customer_address.country_list | filter:searchCountry">
+                                                                            {{country.name}}
+                                                                        </md-option>
+                                                                    </md-optgroup>
+                                                                </md-select>
+                                                                <input type="hidden" name="customer_addresses[{{index}}][country_id]" value='{{customer_address.country_id}}' class="required">
+                                                            </td>
+                                                            <td>
+                                                                <md-select ng-model="customer_address.state_id" ng-change="onSelectedState(customer_address.state_id ,index);customer_address.city_id=''" placeholder="Select State" data-md-container-class="selectdemoSelectHeader">
+                                                                    <md-select-header class="demo-select-header ng-hide">
+                                                                        <input ng-model="searchState" type="search" placeholder="Search State" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                                    </md-select-header>
+                                                                    <md-optgroup label="">
+                                                                        <md-option ng-value="state.id" ng-repeat="state in customer_address.state_list | filter:searchState">
+                                                                            {{state.name}}
+                                                                        </md-option>
+                                                                    </md-optgroup>
+                                                                </md-select>
+                                                                <input type="hidden" name="customer_addresses[{{index}}][state_id]" value='{{customer_address.state_id}}' class="required">
+                                                            </td>
+                                                            <td>
+                                                                <md-select ng-model="customer_address.city_id" placeholder="Select City" data-md-container-class="selectdemoSelectHeader">
+                                                                    <md-select-header class="demo-select-header ng-hide">
+                                                                        <input ng-model="searchCity" type="search" placeholder="Search City" class="demo-header-searchbox md-text" ng-keydown="$event.stopPropagation()">
+                                                                    </md-select-header>
+                                                                    <md-optgroup label="">
+                                                                        <md-option ng-value="city.id" ng-repeat="city in customer_address.city_list | filter:searchCity">
+                                                                            {{city.name}}
+                                                                        </md-option>
+                                                                    </md-optgroup>
+                                                                </md-select>
+                                                                <input type="hidden" name="customer_addresses[{{index}}][city_id]" value='{{customer_address.city_id}}' class="required">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control" ng-model="customer_address.pincode" name="customer_addresses[{{index}}][pincode]" placeholder="Enter Pincode" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  minlength="6" maxlength="6"/>
+                                                            </td>
+                                                            <td>
+                                                                <textarea name="customer_addresses[{{index}}][street]" ng-model="customer_address.street" class="form-control required" rows="3" maxlength="255" placeholder="Enter Street" style="width:230px;"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn-delete" ng-click="$ctrl.removeAddress(index, customer_address.id)" type="button">
+                                                                    <img class="img-responsive" src="./public/theme/img/table/cndn/delete.svg" alt="Delete" />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="3">
+                                                                <button type="button" class="btn btn-primary-light btn-square" ng-click="$ctrl.addAddress()">+ Add Address</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div><!-- Table Responsive -->
+                                        </div><!-- Column -->
+                                        <div class="tab-pane-footer">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <a class="btn btn-secondary btn-prev">
+                                                        Previous
+                                                    </a>
+                                                    <button type="submit" id="submit" class="btn btn-primary" ng-shortcut="'meta+shift+s'" ng-shortcut-click>Submit</button>
+                                                </div>
+                                            </div>
+                                        </div><!-- Tab Footer -->
+                                    </div><!-- Row -->
+                                </div><!-- Tab Pane Wrap -->
+                            </div><!-- Tabe Pane -->
+
                         </div><!-- Tab Content -->
                     </div><!-- Tab Form Body -->
                 </div><!-- Tab Form Wrap -->
