@@ -259,8 +259,10 @@ app.component('customerForm', {
 
         self.addAddress = function() {
             self.customer_address_details.push({
+                is_primary : 0,
                 address_line1 : '',
                 address_line2 : '',
+                gst_number : '',
                 country_id : '',
                 state_id : '',
                 city_id : '',

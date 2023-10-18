@@ -380,8 +380,10 @@
                                                 <table class="table table-form">
                                                     <thead>
                                                         <tr>
+                                                            <th class="width-230">Is Primary<sup class="mandatory">*</sup></th>
                                                             <th class="width-230">Address Line 1<sup class="mandatory">*</sup></th>
                                                             <th class="width-230">Address Line 2</th>
+                                                            <th class="width-230">GST Number</th>
                                                             <th class="width-230">Country<sup class="mandatory">*</sup></th>
                                                             <th class="width-230">State<sup class="mandatory">*</sup></th>
                                                             <th class="width-230">City<sup class="mandatory">*</sup></th>
@@ -393,10 +395,22 @@
                                                         <input type="hidden" name="customer_addresses[{{index}}][id]" value="{{customer_address.id}}">
                                                         <tr>
                                                             <td>
+                                                                <div class="common-radio-button">
+                                                                    
+                                                                    <input type="radio" id="primary_yes_{{index}}" name="customer_addresses[{{index}}][is_primary]" value="1" ng-value="1" ng-model="customer_address.is_primary" ng-checked="customer_address.is_primary == 1" />
+                                                                    <label for="primary_yes_{{index}}">Yes</label>
+                                                                    <input type="radio" id="primary_no_{{index}}" name="customer_addresses[{{index}}][is_primary]" value="0" ng-value="0" ng-model="customer_address.is_primary" ng-checked="!customer_address.is_primary" />
+                                                                    <label for="primary_no_{{index}}">No</label>
+                                                                </div>
+                                                            </td>
+                                                            <td>
                                                                 <input type="text" class="form-control required" ng-model="customer_address.address_line1" name="customer_addresses[{{index}}][address_line1]" placeholder="Enter Address Line 1" maxlength="255" />
                                                             </td>
                                                             <td>
                                                                 <input type="text" class="form-control" ng-model="customer_address.address_line2" name="customer_addresses[{{index}}][address_line2]" placeholder="Enter Address Line 2" maxlength="255"/>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control" ng-model="customer_address.gst_number" name="customer_addresses[{{index}}][gst_number]" placeholder="Enter GST Number" maxlength="191"/>
                                                             </td>
                                                             <td>
                                                                 <md-select ng-model="customer_address.country_id" ng-change="onSelectedCountry(customer_address.country_id, index);customer_address.state_id='';customer_address.city_id=''" placeholder="Select Country" data-md-container-class="selectdemoSelectHeader">
