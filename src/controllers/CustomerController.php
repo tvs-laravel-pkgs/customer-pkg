@@ -244,6 +244,13 @@ class CustomerController extends Controller {
 
 			DB::beginTransaction();
 
+			if (preg_match("/[^A-Za-z0-9-]/", $request->code)) {
+                return response()->json([
+					'success' => false,
+					'errors' => ['Special characters are not allowed in customer code']
+				]);
+            }
+
 			if (!empty($request->address_removal_ids)) {
 				$address_removal_ids = json_decode($request->address_removal_ids, true);
 				Address::whereIn('id', $address_removal_ids)->delete();

@@ -388,9 +388,12 @@ app.component('customerForm', {
                             if (!res.success == true) {
                                 $('#submit').button('reset');
                                 var errors = '';
-                                for (var i in res.errors) {
-                                    errors += '<li>' + res.errors[i] + '</li>';
-                                }
+                                // for (var i in res.errors) {
+                                //     errors += '<li>' + res.errors[i] + '</li>';
+                                // }
+                                $(res.errors).each(function(keys, values) {
+                                    errors += '<li>' + values + '</li>';
+                                });
                                 $noty = new Noty({
                                     type: 'error',
                                     layout: 'topRight',
