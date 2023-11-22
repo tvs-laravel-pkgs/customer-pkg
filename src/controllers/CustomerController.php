@@ -356,9 +356,10 @@ class CustomerController extends Controller {
 					$address->address_type_id = 40;
 					$address->name = 'Primary Address';
 					// $address->gst_number = $request->gst_number;
-					if(!empty($customer_address['gst_number'])){
-						$address->gst_number = $customer_address['gst_number'];
-					}
+					// if(!empty($customer_address['gst_number'])){
+					// 	$address->gst_number = $customer_address['gst_number'];
+					// }
+					$address->gst_number = $customer_address['gst_number'];
 					$address->is_primary = $customer_address['is_primary'];
 					$address->street = $customer_address['street'];
 					$address->save();
