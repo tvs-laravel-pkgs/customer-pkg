@@ -244,7 +244,7 @@ class CustomerController extends Controller {
 
 			DB::beginTransaction();
 
-			if (preg_match("/[^A-Za-z0-9-]/", $request->code)) {
+			if (preg_match("/[^A-Za-z0-9-_]/", $request->code)) {
                 return response()->json([
 					'success' => false,
 					'errors' => ['Special characters are not allowed in customer code']
