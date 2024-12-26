@@ -356,7 +356,15 @@ class Customer extends BaseModel {
 
 	public static function searchCustomer($r) {
 		$key = $r->key;
-		$list = self::with(['primaryAddress'])->where('company_id', Auth::user()->company_id)
+		$companyId = Auth::user()->company_id;
+		$companyIds = [$companyId];
+		$showMobCustomer = Config::getConfigName(8665);
+		$showMobCompanies = Config::getConfigName(8667);
+		$showMobCompanies = explode(',', $showMobCompanies);
+		if (in_array($companyId, $showMobCompanies) && $showMobCustomer == 'show') {
+			$companyIds = [$companyId, 4];
+		}
+		$list = self::with(['primaryAddress'])->whereIn('company_id', $companyIds)
 			->select(
 				'id',
 				'name',
